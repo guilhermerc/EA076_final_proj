@@ -1,0 +1,42 @@
+0.	I2C baud rate >= bus speed (Hz)/(mul × SCL divider)	(I2C baud rate =  SCL)	
+	SCL divider >= bus speed (Hz)/(mul × I2C baud rate)
+	
+	bus speed (Hz) = 20.97152 MHz
+	[bus period (s) = 47.68371582 ns]
+	I2C baud rate = 400 kHz 				Warning: The device is designed to operate up to 100 kHz! (SCL frequency)
+
+	mul = 1
+
+	SCL divider >= 52.4288					SCL divider >= 209.7152
+
+ICR bits enables me to choose SCL_{divider}
+ 
+1.	SDA hold time <= bus period (s) × mul × SDA hold value
+	SDA hold value >= SDA hold time/(bus_period * mul)	
+	SDA hold value >= t_{HD.DAT}/(bus_period * mul)
+
+	t_{HD.DAT} = 0 us -> SDA hold value >= 0 [9 CHECK]	[33 CHECK]
+
+2.	SCL start hold time <= bus period (s) × mul × SCL start hold value
+	SCL start hold value >= SCL start hold time/(bus period (s) * mul)
+	SCL start hold value >= t_{HD.STA}/(bus period (s) * mul)
+
+	t_{HD.STA} = 0.6 us
+	bus period (s) = 47.68371582 ns
+	mul = 1
+
+	SCL start hold value >= 12.582912 [22 CHECK]		[118 CHECK]
+
+
+3.	SCL stop hold time <= bus period (s) × mul × SCL stop hold value
+	SCL stop hold value >= SCL stop hold time/(bus period (s) × mul)
+	SCL stop hold value >= t_{SU.STO}/(bus period (s) × mul)
+
+	t_{SU.STO} = 0.6 us
+	bus period (s) = 47.68371582 ns
+	mul = 1
+	
+	SCL stop hold value >= 12.582912 [29 CHECK]		[121 CHECK]
+
+Conclusion: ICR: 0x11 = 0001 0001 (010 001)			ICR: 0x1F = 0001 1111 (011 111)
+
