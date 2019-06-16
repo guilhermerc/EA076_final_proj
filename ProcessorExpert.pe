@@ -3,7 +3,7 @@
   <Header>
     <Name>EA076_final_proj</Name>
     <SavedBy>guilherme</SavedBy>
-    <ModificationStamp>117</ModificationStamp>
+    <ModificationStamp>118</ModificationStamp>
     <Date>2019-03-18</Date>
     <IDE>Eclipse IDE</IDE>
     <PEversion>1.12.2.RT7_b1550-0615</PEversion>
@@ -10960,7 +10960,7 @@
     <Name>TI1</Name>
     <CompNumb>84</CompNumb>
     <CompEnabled>true</CompEnabled>
-    <GenCodeMode>ALWAYS_WRITE</GenCodeMode>
+    <GenCodeMode>DONT_WRITE</GenCodeMode>
     <IconName>TMRCNTR</IconName>
     <UserFolderName />
     <Comment lines_count="0" />
@@ -11702,10 +11702,10 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Index>0</Index>
-        <Value>true</Value>
+        <Index>1</Index>
+        <Value>false</Value>
         <LastSelection>true</LastSelection>
-        <LastUserSel>yes</LastUserSel>
+        <LastUserSel>no</LastUserSel>
         <UsrMethodName>DisableEvent</UsrMethodName>
       </ItemState>
       <ItemState>
