@@ -8,7 +8,7 @@
 **     Repository  : Kinetis
 **     Datasheet   : KL25P80M48SF0RM, Rev.3, Sep 2012
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-16, 18:43, # CodeGen: 21
+**     Date/Time   : 2019-06-16, 19:22, # CodeGen: 26
 **     Abstract    :
 **
 **     Settings    :
@@ -256,8 +256,13 @@
 #include "MCUC1.h"
 #include "KY_038.h"
 #include "ExtIntLdd1.h"
+#include "TI1.h"
+#include "TimerIntLdd1.h"
 #include "RED_LED.h"
 #include "BitIoLdd1.h"
+#include "TU1.h"
+#include "GREEN_LED.h"
+#include "BitIoLdd2.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"
@@ -471,8 +476,13 @@ void PE_low_level_init(void)
   MCUC1_Init(); /* ### McuLibConfig "MCUC1" init code ... */
   /* ### ExtInt_LDD "ExtIntLdd1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
   (void)ExtIntLdd1_Init(NULL);
+  /* ### TimerInt_LDD "TimerIntLdd1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
+  (void)TimerIntLdd1_Init(NULL);
+  /* ### TimerInt "TI1" init code ... */
   /* ### BitIO_LDD "BitIoLdd1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
   (void)BitIoLdd1_Init(NULL);
+  /* ### BitIO_LDD "BitIoLdd2" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
+  (void)BitIoLdd2_Init(NULL);
   __EI();
 }
   /* Flash configuration field */

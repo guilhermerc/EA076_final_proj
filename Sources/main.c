@@ -32,6 +32,7 @@
 #include <CPU.h>
 #include <event_buff.h>
 #include <KY_038.h>
+#include <TI1.h>
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
 
@@ -57,6 +58,7 @@ int main(void)
 	comm_init();
 
 	KY_038_Enable();
+	TI1_Enable();
 
 	/*!
 	 * Infinite loop that checks if the event ring buffer has events to

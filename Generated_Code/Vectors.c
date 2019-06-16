@@ -6,7 +6,7 @@
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-16, 18:43, # CodeGen: 21
+**     Date/Time   : 2019-06-16, 19:22, # CodeGen: 26
 **     Abstract    :
 **
 **     Settings    :
@@ -62,8 +62,13 @@
   #include "MCUC1.h"
   #include "KY_038.h"
   #include "ExtIntLdd1.h"
+  #include "TI1.h"
+  #include "TimerIntLdd1.h"
   #include "RED_LED.h"
   #include "BitIoLdd1.h"
+  #include "TU1.h"
+  #include "GREEN_LED.h"
+  #include "BitIoLdd2.h"
   #include "Events.h"
 
 
@@ -118,7 +123,7 @@
     (tIsrFunc)&CPU_Interrupt,          /* 0x20  0x00000080   -   ivINT_CMP0                    unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x21  0x00000084   -   ivINT_TPM0                    unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x22  0x00000088   -   ivINT_TPM1                    unused by PE */
-    (tIsrFunc)&CPU_Interrupt,          /* 0x23  0x0000008C   -   ivINT_TPM2                    unused by PE */
+    (tIsrFunc)&TU1_Interrupt,          /* 0x23  0x0000008C   2   ivINT_TPM2                    used by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x24  0x00000090   -   ivINT_RTC                     unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x25  0x00000094   -   ivINT_RTC_Seconds             unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x26  0x00000098   -   ivINT_PIT                     unused by PE */

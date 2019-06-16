@@ -18,16 +18,29 @@
 #include <event_buff.h>
 #include <PE_Types.h>
 #include <stdint.h>
+#include <TI1.h>
 #include <UART0.h>
 #include <UART2.h>
+#include "CPU.h"
 #include "Events.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif 
 
-
 /* User includes (#include below this line is not maintained by Processor Expert) */
+
+#define	TIMEOUT	6	// 600 ms of timeout. TODO: Check if this is a good value.
+
+/* A static variable that counts how many 100 ms timer interruptions have
+ * occurred
+ */
+static uint8_t timeout_counter = 0;
+
+/* A static variable that counts the number of snapping in a given period
+ * (namely "timeout")
+ */
+static uint8_t snapping_counter = 0;
 
 /*
 ** ===================================================================
@@ -240,8 +253,51 @@ void UART2_OnTxChar(void)
 */
 void KY_038_OnInterrupt(void)
 {
-	/* Finger snapping event */
-	event_buff_insert_event(FINGER_SNAPPING);
+	/* If this is the first snapping since the last timeout, starts a new
+	 * timeout counting process.
+	 */
+	if(snapping_counter == 0)
+	{
+		timeout_counter = 0;
+		TI1_EnableEvent();
+	}
+
+	snapping_counter++;	// And increment the number of snappings
+}
+
+/*
+** ===================================================================
+**     Event       :  TI1_OnInterrupt (module Events)
+**
+**     Component   :  TI1 [TimerInt]
+**     Description :
+**         When a timer interrupt occurs this event is called (only
+**         when the component is enabled - <Enable> and the events are
+**         enabled - <EnableEvent>). This event is enabled only if a
+**         <interrupt service/event> is enabled.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void TI1_OnInterrupt(void)
+{
+  	timeout_counter++;
+
+  	/* If the timeout was achieved, inserts the proper event into the event
+  	 * buffer.
+  	 * NOTE: If 3 or more snappings occurred, it is not considered an event.
+  	 */
+  	if(timeout_counter == TIMEOUT)
+  	{
+  		if(snapping_counter == 1)
+  			event_buff_insert_event(SINGLE_FINGER_SNAPPING);
+  		else if(snapping_counter == 2)
+  			event_buff_insert_event(DOUBLE_FINGER_SNAPPING);
+
+  		snapping_counter = 0;
+
+  		TI1_DisableEvent();
+  	}
 }
 
 /* END Events */
