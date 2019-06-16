@@ -7,7 +7,7 @@
 **     Version     : Component 02.156, Driver 01.02, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-15, 18:06, # CodeGen: 17
+**     Date/Time   : 2019-06-16, 18:30, # CodeGen: 20
 **     Abstract    :
 **         This component, "ExtInt_LDD", provide a low level API 
 **         for unified access of external interrupts handling
@@ -18,7 +18,7 @@
 **          Component name                                 : ExtIntLdd1
 **          Pin                                            : PTA5/USB_CLKIN/TPM0_CH2
 **          Pin signal                                     : 
-**          Generate interrupt on                          : both edges
+**          Generate interrupt on                          : rising edge
 **          Interrupt                                      : INT_PORTA
 **          Interrupt priority                             : medium priority
 **          Initialization                                 : 
@@ -27,7 +27,6 @@
 **     Contents    :
 **         Init   - LDD_TDeviceData* ExtIntLdd1_Init(LDD_TUserData *UserDataPtr);
 **         Enable - void ExtIntLdd1_Enable(LDD_TDeviceData *DeviceDataPtr);
-**         GetVal - bool ExtIntLdd1_GetVal(LDD_TDeviceData *DeviceDataPtr);
 **
 **     Copyright : 1997 - 2015 Freescale Semiconductor, Inc. 
 **     All Rights Reserved.
@@ -172,7 +171,7 @@ void ExtIntLdd1_Enable(LDD_TDeviceData *DeviceDataPtr)
   (void)DeviceDataPtr;                 /* Parameter is not used, suppress unused argument warning */
   PORT_PDD_ClearPinInterruptFlag(PORTA_BASE_PTR, ExtIntLdd1_PIN_INDEX);
   PORT_PDD_SetPinInterruptConfiguration(PORTA_BASE_PTR,
-    ExtIntLdd1_PIN_INDEX, PORT_PDD_INTERRUPT_ON_RISING_FALLING);
+    ExtIntLdd1_PIN_INDEX, PORT_PDD_INTERRUPT_ON_RISING);
   DeviceDataPrv->UserEnabled = TRUE;   /* Set device as Enabled */
 }
 
@@ -199,32 +198,6 @@ PE_ISR(ExtIntLdd1_Interrupt)
   PORT_PDD_ClearPinInterruptFlag(PORTA_BASE_PTR, ExtIntLdd1_PIN_INDEX);
   /* Call OnInterrupt event */
   ExtIntLdd1_OnInterrupt(DeviceDataPrv->UserData);
-}
-
-/*
-** ===================================================================
-**     Method      :  ExtIntLdd1_GetVal (component ExtInt_LDD)
-*/
-/*!
-**     @brief
-**         Returns the actual value of the input pin of the component.
-**     @param
-**         DeviceDataPtr   - Device data structure
-**                           pointer returned by <Init> method.
-**     @return
-**                         - Returned input value. Possible values:
-**                           <false> - logical "0" (Low level) <true> -
-**                           logical "1" (High level)
-*/
-/* ===================================================================*/
-bool ExtIntLdd1_GetVal(LDD_TDeviceData *DeviceDataPtr)
-{
-  (void)DeviceDataPtr;                 /* Parameter is not used, suppress unused argument warning */
-  if ((GPIO_PDD_GetPortDataInput(PTA_BASE_PTR) & ExtIntLdd1_PIN_MASK) != 0U) {
-    return TRUE;
-  } else {
-    return FALSE;
-  }
 }
 
 /* END ExtIntLdd1. */

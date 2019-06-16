@@ -7,7 +7,7 @@
 **     Version     : Component 02.156, Driver 01.02, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-15, 18:06, # CodeGen: 17
+**     Date/Time   : 2019-06-16, 18:30, # CodeGen: 20
 **     Abstract    :
 **         This component, "ExtInt_LDD", provide a low level API 
 **         for unified access of external interrupts handling
@@ -18,7 +18,7 @@
 **          Component name                                 : ExtIntLdd1
 **          Pin                                            : PTA5/USB_CLKIN/TPM0_CH2
 **          Pin signal                                     : 
-**          Generate interrupt on                          : both edges
+**          Generate interrupt on                          : rising edge
 **          Interrupt                                      : INT_PORTA
 **          Interrupt priority                             : medium priority
 **          Initialization                                 : 
@@ -27,7 +27,6 @@
 **     Contents    :
 **         Init   - LDD_TDeviceData* ExtIntLdd1_Init(LDD_TUserData *UserDataPtr);
 **         Enable - void ExtIntLdd1_Enable(LDD_TDeviceData *DeviceDataPtr);
-**         GetVal - bool ExtIntLdd1_GetVal(LDD_TDeviceData *DeviceDataPtr);
 **
 **     Copyright : 1997 - 2015 Freescale Semiconductor, Inc. 
 **     All Rights Reserved.
@@ -105,7 +104,6 @@ extern "C" {
 /* Methods configuration constants - generated for all enabled component's methods */
 #define ExtIntLdd1_Init_METHOD_ENABLED /*!< Init method of the component ExtIntLdd1 is enabled (generated) */
 #define ExtIntLdd1_Enable_METHOD_ENABLED /*!< Enable method of the component ExtIntLdd1 is enabled (generated) */
-#define ExtIntLdd1_GetVal_METHOD_ENABLED /*!< GetVal method of the component ExtIntLdd1 is enabled (generated) */
 
 /* Events configuration constants - generated for all enabled component's events */
 #define ExtIntLdd1_OnInterrupt_EVENT_ENABLED /*!< OnInterrupt event of the component ExtIntLdd1 is enabled (generated) */
@@ -163,24 +161,6 @@ void ExtIntLdd1_Enable(LDD_TDeviceData *DeviceDataPtr);
 */
 /* {Default RTOS Adapter} ISR function prototype */
 PE_ISR(ExtIntLdd1_Interrupt);
-
-/*
-** ===================================================================
-**     Method      :  ExtIntLdd1_GetVal (component ExtInt_LDD)
-*/
-/*!
-**     @brief
-**         Returns the actual value of the input pin of the component.
-**     @param
-**         DeviceDataPtr   - Device data structure
-**                           pointer returned by <Init> method.
-**     @return
-**                         - Returned input value. Possible values:
-**                           <false> - logical "0" (Low level) <true> -
-**                           logical "1" (High level)
-*/
-/* ===================================================================*/
-bool ExtIntLdd1_GetVal(LDD_TDeviceData *DeviceDataPtr);
 
 /* END ExtIntLdd1. */
 

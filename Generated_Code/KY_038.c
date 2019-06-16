@@ -7,7 +7,7 @@
 **     Version     : Component 02.105, Driver 01.00, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-15, 18:06, # CodeGen: 17
+**     Date/Time   : 2019-06-16, 18:30, # CodeGen: 20
 **     Abstract    :
 **         This component "ExtInt" implements an external 
 **         interrupt, its control methods and interrupt/event 
@@ -19,14 +19,13 @@
 **          Pin                                            : PTA5/USB_CLKIN/TPM0_CH2
 **          Pin signal                                     : 
 **          ExtInt_LDD                                     : ExtInt_LDD
-**          Generate interrupt on                          : both edges
+**          Generate interrupt on                          : rising edge
 **          Interrupt                                      : INT_PORTA
 **          Interrupt priority                             : medium priority
 **          Initialization                                 : 
 **            Enabled in init. code                        : no
 **     Contents    :
 **         Enable - void KY_038_Enable(void);
-**         GetVal - bool KY_038_GetVal(void);
 **
 **     Copyright : 1997 - 2015 Freescale Semiconductor, Inc. 
 **     All Rights Reserved.
@@ -96,24 +95,6 @@ extern "C" {
 */
 /*
 void KY_038_Enable(void)
-
-**  This method is implemented as a macro. See KY_038.h file.  **
-*/
-
-/*
-** ===================================================================
-**     Method      :  KY_038_GetVal (component ExtInt)
-**     Description :
-**         Returns the actual value of the input pin of the component.
-**     Parameters  : None
-**     Returns     :
-**         ---             - Returned input value. Possible values:
-**                           <false> - logical "0" (Low level) <true> -
-**                           logical "1" (High level)
-** ===================================================================
-*/
-/*
-bool KY_038_GetVal(void)
 
 **  This method is implemented as a macro. See KY_038.h file.  **
 */
