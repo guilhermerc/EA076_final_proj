@@ -240,7 +240,8 @@ void UART2_OnTxChar(void)
 */
 void KY_038_OnInterrupt(void)
 {
-  /* Write your code here ... */
+	/* Finger snapping event */
+	event_buff_insert_event(FINGER_SNAPPING);
 }
 
 /* END Events */

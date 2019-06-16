@@ -31,6 +31,7 @@
 #include <console.h>
 #include <CPU.h>
 #include <event_buff.h>
+#include <KY_038.h>
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
 
@@ -54,6 +55,8 @@ int main(void)
 
 	console_init();
 	comm_init();
+
+	KY_038_Enable();
 
 	/*!
 	 * Infinite loop that checks if the event ring buffer has events to

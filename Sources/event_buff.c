@@ -8,6 +8,7 @@
 
 #include <comm.h>
 #include <event_buff.h>
+#include <RED_LED.h>
 #include <UART0.h>
 #include <UART2.h>
 
@@ -169,5 +170,12 @@ void event_handler(EVENT_BUFF_TYPE event)
 			event_handler_read_message(TERMINAL);
 			comm_process_msg();
 		}
+	}
+	else if(event == FINGER_SNAPPING)
+	{
+		/* TODO: Properly treat this event publishing a message in a specific
+		 * topic
+		 */
+		RED_LED_NegVal();
 	}
 }

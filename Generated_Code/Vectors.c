@@ -6,7 +6,7 @@
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-15, 18:06, # CodeGen: 17
+**     Date/Time   : 2019-06-16, 18:43, # CodeGen: 21
 **     Abstract    :
 **
 **     Settings    :
@@ -62,6 +62,8 @@
   #include "MCUC1.h"
   #include "KY_038.h"
   #include "ExtIntLdd1.h"
+  #include "RED_LED.h"
+  #include "BitIoLdd1.h"
   #include "Events.h"
 
 
