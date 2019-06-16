@@ -34,19 +34,6 @@
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
 
-/*! List of TODO's that as soon as I have time I'll integrate
- *
- *  TODO: Change what have to be changed due to the correct size of
- *  display = 14.
- *	TODO: Protect the boundaries of motor_change_speed function.
- *	TODO: I should have logged the raw value of temperature since it
- *	uses only 2 bytes instead of 4 bytes used by the its string
- *	representation.
- *  TODO: I should handle the border of EEPROM memory and treat it as a
- *  "ring memory". I'm not even handling the case in which all of the
- *  pages were already written.
- *  */
-
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
