@@ -7,7 +7,7 @@
 **     Version     : Component 02.105, Driver 01.00, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-16, 18:30, # CodeGen: 20
+**     Date/Time   : 2019-06-17, 18:24, # CodeGen: 40
 **     Abstract    :
 **         This component "ExtInt" implements an external 
 **         interrupt, its control methods and interrupt/event 
@@ -25,7 +25,8 @@
 **          Initialization                                 : 
 **            Enabled in init. code                        : no
 **     Contents    :
-**         Enable - void KY_038_Enable(void);
+**         Enable  - void KY_038_Enable(void);
+**         Disable - void KY_038_Disable(void);
 **
 **     Copyright : 1997 - 2015 Freescale Semiconductor, Inc. 
 **     All Rights Reserved.
@@ -95,6 +96,23 @@ extern "C" {
 */
 /*
 void KY_038_Enable(void)
+
+**  This method is implemented as a macro. See KY_038.h file.  **
+*/
+
+/*
+** ===================================================================
+**     Method      :  KY_038_Disable (component ExtInt)
+**     Description :
+**         Disable the component - the external events are not accepted.
+**         This method is available only if HW module allows
+**         enable/disable of the interrupt.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+/*
+void KY_038_Disable(void)
 
 **  This method is implemented as a macro. See KY_038.h file.  **
 */

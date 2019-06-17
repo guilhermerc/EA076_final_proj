@@ -6,7 +6,7 @@
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-16, 19:22, # CodeGen: 26
+**     Date/Time   : 2019-06-17, 17:24, # CodeGen: 34
 **     Abstract    :
 **
 **     Settings    :
@@ -64,11 +64,12 @@
   #include "ExtIntLdd1.h"
   #include "TI1.h"
   #include "TimerIntLdd1.h"
+  #include "GREEN_LED.h"
+  #include "BitIoLdd2.h"
   #include "RED_LED.h"
   #include "BitIoLdd1.h"
   #include "TU1.h"
-  #include "GREEN_LED.h"
-  #include "BitIoLdd2.h"
+  #include "DEBOUNCING.h"
   #include "Events.h"
 
 

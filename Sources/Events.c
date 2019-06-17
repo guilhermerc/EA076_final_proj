@@ -15,8 +15,10 @@
 
 #include <comm.h>
 #include <console.h>
+#include <DEBOUNCING.h>
 #include <event_buff.h>
 #include <PE_Types.h>
+#include <PORT_PDD.h>
 #include <stdint.h>
 #include <TI1.h>
 #include <UART0.h>
@@ -30,7 +32,8 @@ extern "C" {
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
 
-#define	TIMEOUT	6	// 600 ms of timeout. TODO: Check if this is a good value.
+#define	TIMEOUT	20 // 600 ms of timeout. TODO: Check if this is a good value.
+#define DEBOUNCING_TIMEOUT	1500
 
 /* A static variable that counts how many 100 ms timer interruptions have
  * occurred
@@ -256,6 +259,9 @@ void KY_038_OnInterrupt(void)
 	/* If this is the first snapping since the last timeout, starts a new
 	 * timeout counting process.
 	 */
+
+	DEBOUNCING_Waitms(DEBOUNCING_TIMEOUT);
+
 	if(snapping_counter == 0)
 	{
 		timeout_counter = 0;
@@ -263,6 +269,8 @@ void KY_038_OnInterrupt(void)
 	}
 
 	snapping_counter++;	// And increment the number of snappings
+
+	PORT_PDD_ClearPinInterruptFlag(PORTA_BASE_PTR, 5);
 }
 
 /*
