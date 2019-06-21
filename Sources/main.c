@@ -36,6 +36,11 @@
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
 
+/* TODO: Read about the KY-038 sensor
+ * TODO: Test if it's possible to connect to the MQTT Broker hosted in my
+ * computer using a smartphone
+ */
+
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
