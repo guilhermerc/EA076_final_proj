@@ -32,8 +32,8 @@ extern "C" {
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
 
-#define	TIMEOUT	20 // 600 ms of timeout. TODO: Check if this is a good value.
-#define DEBOUNCING_TIMEOUT	1500
+#define	TIMEOUT	10 // 600 ms of timeout. TODO: Check if this is a good value.
+#define DEBOUNCING_TIMEOUT	100
 
 /* A static variable that counts how many 100 ms timer interruptions have
  * occurred
@@ -260,7 +260,9 @@ void KY_038_OnInterrupt(void)
 	 * timeout counting process.
 	 */
 
-	DEBOUNCING_Waitms(DEBOUNCING_TIMEOUT);
+    EnterCritical();                   /* Disable global interrupts */
+
+    DEBOUNCING_Waitms(DEBOUNCING_TIMEOUT);
 
 	if(snapping_counter == 0)
 	{
@@ -269,6 +271,8 @@ void KY_038_OnInterrupt(void)
 	}
 
 	snapping_counter++;	// And increment the number of snappings
+
+    ExitCritical();                    /* Enable global interrupts */
 
 	PORT_PDD_ClearPinInterruptFlag(PORTA_BASE_PTR, 5);
 }
@@ -297,9 +301,9 @@ void TI1_OnInterrupt(void)
   	 */
   	if(timeout_counter == TIMEOUT)
   	{
-  		if(snapping_counter == 1)
+  		if(snapping_counter == 2)
   			event_buff_insert_event(SINGLE_FINGER_SNAPPING);
-  		else if(snapping_counter == 2)
+  		else if(snapping_counter == 4)
   			event_buff_insert_event(DOUBLE_FINGER_SNAPPING);
 
   		snapping_counter = 0;
