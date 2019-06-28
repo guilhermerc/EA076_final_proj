@@ -8,8 +8,8 @@
 
 #include <comm.h>
 #include <event_buff.h>
-#include <GREEN_LED.h>
-#include <RED_LED.h>
+//#include <GREEN_LED.h>
+//#include <RED_LED.h>
 #include <UART0.h>
 #include <UART2.h>
 
@@ -174,10 +174,10 @@ void event_handler(EVENT_BUFF_TYPE event)
 	}
 	else if(event == SINGLE_FINGER_SNAPPING)
 	{
-		RED_LED_NegVal();
+		//RED_LED_NegVal();
 	}
 	else if(event == DOUBLE_FINGER_SNAPPING)
 	{
-		GREEN_LED_NegVal();
+		//GREEN_LED_NegVal();
 	}
 }

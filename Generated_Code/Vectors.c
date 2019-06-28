@@ -6,7 +6,7 @@
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-17, 17:24, # CodeGen: 34
+**     Date/Time   : 2019-06-28, 11:06, # CodeGen: 46
 **     Abstract    :
 **
 **     Settings    :
@@ -64,12 +64,21 @@
   #include "ExtIntLdd1.h"
   #include "TI1.h"
   #include "TimerIntLdd1.h"
-  #include "GREEN_LED.h"
-  #include "BitIoLdd2.h"
-  #include "RED_LED.h"
-  #include "BitIoLdd1.h"
   #include "TU1.h"
   #include "DEBOUNCING.h"
+  #include "MMA1.h"
+  #include "WAIT1.h"
+  #include "GI2C1.h"
+  #include "CI2C1.h"
+  #include "LEDR.h"
+  #include "LEDpin1.h"
+  #include "BitIoLdd1.h"
+  #include "LEDG.h"
+  #include "LEDpin2.h"
+  #include "BitIoLdd2.h"
+  #include "LEDB.h"
+  #include "LEDpin3.h"
+  #include "BitIoLdd3.h"
   #include "Events.h"
 
 
@@ -113,7 +122,7 @@
     (tIsrFunc)&CPU_Interrupt,          /* 0x15  0x00000054   -   ivINT_FTFA                    unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x16  0x00000058   -   ivINT_LVD_LVW                 unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x17  0x0000005C   -   ivINT_LLWU                    unused by PE */
-    (tIsrFunc)&CPU_Interrupt,          /* 0x18  0x00000060   -   ivINT_I2C0                    unused by PE */
+    (tIsrFunc)&CI2C1_Interrupt,        /* 0x18  0x00000060   2   ivINT_I2C0                    used by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x19  0x00000064   -   ivINT_I2C1                    unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x1A  0x00000068   -   ivINT_SPI0                    unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x1B  0x0000006C   -   ivINT_SPI1                    unused by PE */

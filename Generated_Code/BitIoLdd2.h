@@ -7,7 +7,7 @@
 **     Version     : Component 01.033, Driver 01.03, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-16, 19:22, # CodeGen: 26
+**     Date/Time   : 2019-06-28, 11:06, # CodeGen: 46
 **     Abstract    :
 **         The HAL BitIO component provides a low level API for unified
 **         access to general purpose digital input/output pins across
@@ -22,11 +22,14 @@
 **          Direction                                      : Output
 **          Initialization                                 : 
 **            Init. direction                              : Output
-**            Init. value                                  : 1
+**            Init. value                                  : 0
 **            Auto initialization                          : yes
 **          Safe mode                                      : yes
 **     Contents    :
 **         Init   - LDD_TDeviceData* BitIoLdd2_Init(LDD_TUserData *UserDataPtr);
+**         GetVal - bool BitIoLdd2_GetVal(LDD_TDeviceData *DeviceDataPtr);
+**         ClrVal - void BitIoLdd2_ClrVal(LDD_TDeviceData *DeviceDataPtr);
+**         SetVal - void BitIoLdd2_SetVal(LDD_TDeviceData *DeviceDataPtr);
 **         NegVal - void BitIoLdd2_NegVal(LDD_TDeviceData *DeviceDataPtr);
 **
 **     Copyright : 1997 - 2015 Freescale Semiconductor, Inc. 
@@ -106,6 +109,9 @@ extern "C" {
 
 /* Methods configuration constants - generated for all enabled component's methods */
 #define BitIoLdd2_Init_METHOD_ENABLED  /*!< Init method of the component BitIoLdd2 is enabled (generated) */
+#define BitIoLdd2_GetVal_METHOD_ENABLED /*!< GetVal method of the component BitIoLdd2 is enabled (generated) */
+#define BitIoLdd2_ClrVal_METHOD_ENABLED /*!< ClrVal method of the component BitIoLdd2 is enabled (generated) */
+#define BitIoLdd2_SetVal_METHOD_ENABLED /*!< SetVal method of the component BitIoLdd2 is enabled (generated) */
 #define BitIoLdd2_NegVal_METHOD_ENABLED /*!< NegVal method of the component BitIoLdd2 is enabled (generated) */
 
 /* Definition of implementation constants */
@@ -138,6 +144,60 @@ extern "C" {
 */
 /* ===================================================================*/
 LDD_TDeviceData* BitIoLdd2_Init(LDD_TUserData *UserDataPtr);
+
+/*
+** ===================================================================
+**     Method      :  BitIoLdd2_GetVal (component BitIO_LDD)
+*/
+/*!
+**     @brief
+**         Returns the input/output value. If the direction is [input]
+**         then the input value of the pin is read and returned. If the
+**         direction is [output] then the last written value is read
+**         and returned (see <Safe mode> property for limitations).
+**         This method cannot be disabled if direction is [input].
+**     @param
+**         DeviceDataPtr   - Device data structure
+**                           pointer returned by <Init> method.
+**     @return
+**                         - Input or output value. Possible values:
+**                           <false> - logical "0" (Low level)
+**                           <true> - logical "1" (High level)
+*/
+/* ===================================================================*/
+bool BitIoLdd2_GetVal(LDD_TDeviceData *DeviceDataPtr);
+
+/*
+** ===================================================================
+**     Method      :  BitIoLdd2_ClrVal (component BitIO_LDD)
+*/
+/*!
+**     @brief
+**         Clears (set to zero) the output value. It is equivalent to
+**         the [PutVal(FALSE)]. This method is available only if the
+**         direction = _[output]_ or _[input/output]_.
+**     @param
+**         DeviceDataPtr   - Pointer to device data
+**                           structure returned by <Init> method.
+*/
+/* ===================================================================*/
+void BitIoLdd2_ClrVal(LDD_TDeviceData *DeviceDataPtr);
+
+/*
+** ===================================================================
+**     Method      :  BitIoLdd2_SetVal (component BitIO_LDD)
+*/
+/*!
+**     @brief
+**         Sets (to one) the output value. It is equivalent to the
+**         [PutVal(TRUE)]. This method is available only if the
+**         direction = _[output]_ or _[input/output]_.
+**     @param
+**         DeviceDataPtr   - Pointer to device data
+**                           structure returned by <Init> method.
+*/
+/* ===================================================================*/
+void BitIoLdd2_SetVal(LDD_TDeviceData *DeviceDataPtr);
 
 /*
 ** ===================================================================

@@ -8,7 +8,7 @@
 **     Repository  : Kinetis
 **     Datasheet   : KL25P80M48SF0RM, Rev.3, Sep 2012
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-17, 17:24, # CodeGen: 34
+**     Date/Time   : 2019-06-28, 11:06, # CodeGen: 46
 **     Abstract    :
 **
 **     Settings    :
@@ -258,12 +258,21 @@
 #include "ExtIntLdd1.h"
 #include "TI1.h"
 #include "TimerIntLdd1.h"
-#include "GREEN_LED.h"
-#include "BitIoLdd2.h"
-#include "RED_LED.h"
-#include "BitIoLdd1.h"
 #include "TU1.h"
 #include "DEBOUNCING.h"
+#include "MMA1.h"
+#include "WAIT1.h"
+#include "GI2C1.h"
+#include "CI2C1.h"
+#include "LEDR.h"
+#include "LEDpin1.h"
+#include "BitIoLdd1.h"
+#include "LEDG.h"
+#include "LEDpin2.h"
+#include "BitIoLdd2.h"
+#include "LEDB.h"
+#include "LEDpin3.h"
+#include "BitIoLdd3.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"
@@ -329,8 +338,9 @@ void __init_hardware(void)
   /* System clock initialization */
   /* SIM_CLKDIV1: OUTDIV1=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,OUTDIV4=3,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0 */
   SIM_CLKDIV1 = (SIM_CLKDIV1_OUTDIV1(0x00) | SIM_CLKDIV1_OUTDIV4(0x03)); /* Set the system prescalers to safe value */
-  /* SIM_SCGC5: PORTE=1,PORTC=1,PORTB=1,PORTA=1 */
+  /* SIM_SCGC5: PORTE=1,PORTD=1,PORTC=1,PORTB=1,PORTA=1 */
   SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK |
+               SIM_SCGC5_PORTD_MASK |
                SIM_SCGC5_PORTC_MASK |
                SIM_SCGC5_PORTB_MASK |
                SIM_SCGC5_PORTA_MASK;   /* Enable clock gate for ports to enable pin routing */
@@ -480,11 +490,23 @@ void PE_low_level_init(void)
   /* ### TimerInt_LDD "TimerIntLdd1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
   (void)TimerIntLdd1_Init(NULL);
   /* ### TimerInt "TI1" init code ... */
-  /* ### BitIO_LDD "BitIoLdd2" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
-  (void)BitIoLdd2_Init(NULL);
+  DEBOUNCING_Init(); /* ### Wait "DEBOUNCING" init code ... */
+  WAIT1_Init(); /* ### Wait "WAIT1" init code ... */
+  /* ### I2C_LDD "CI2C1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
+  (void)CI2C1_Init(NULL);
+  GI2C1_Init(); /* ### GenericI2C "GI2C1" init code ... */
+#if MMA1_CONFIG_INIT_DRIVER_IN_STARTUP
+  MMA1_Init(); /* ### MMA8451Q "MMA1" init code ... */
+#endif
   /* ### BitIO_LDD "BitIoLdd1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
   (void)BitIoLdd1_Init(NULL);
-  DEBOUNCING_Init(); /* ### Wait "DEBOUNCING" init code ... */
+  LEDR_Init(); /* ### LED "LEDR" init code ... */
+  /* ### BitIO_LDD "BitIoLdd2" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
+  (void)BitIoLdd2_Init(NULL);
+  LEDG_Init(); /* ### LED "LEDG" init code ... */
+  /* ### BitIO_LDD "BitIoLdd3" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
+  (void)BitIoLdd3_Init(NULL);
+  LEDB_Init(); /* ### LED "LEDB" init code ... */
   __EI();
 }
   /* Flash configuration field */

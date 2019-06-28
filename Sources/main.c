@@ -32,6 +32,12 @@
 #include <CPU.h>
 #include <event_buff.h>
 #include <KY_038.h>
+#include <LEDR.h>
+#include <LEDG.h>
+#include <LEDB.h>
+#include <MMA1.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <TI1.h>
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
@@ -65,14 +71,29 @@ int main(void)
 	KY_038_Enable();
 	TI1_Enable();
 
+	MMA1_Init();
+
 	/*!
 	 * Infinite loop that checks if the event ring buffer has events to
 	 * be handled.
 	 */
 	for(;;)
 	{
+		int16_t x = 0,
+				y = 0,
+				z = 0;
+
+        x = MMA1_GetX();
+        y = MMA1_GetY();
+        z = MMA1_GetZ();
+
+        LEDR_Put(abs(x) > 2000);
+        LEDG_Put(abs(y) > 2000);
+        LEDB_Put(abs(z) > 2000);
+
 		if(!event_buff_is_empty())
 			event_handler(event_buff_consume_event());
+
 	}
 
 	/*** Don't write any code pass this line, or it will be deleted during code generation. ***/
