@@ -32,15 +32,15 @@
 #include <CPU.h>
 #include <event_buff.h>
 #include <KY_038.h>
-#include <LEDR.h>
-#include <LEDG.h>
-#include <LEDB.h>
 #include <MMA1.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <TI1.h>
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
+
+enum ORIENTATION { HORIZONTAL, LATERAL, VERTICAL };
+
+#define GRAVITY_THRESHOLD	2000
 
 /* TODO: Read about the KY-038 sensor
  * TODO: Test if it's possible to connect to the MQTT Broker hosted in my
@@ -79,21 +79,29 @@ int main(void)
 	 */
 	for(;;)
 	{
-		int16_t x = 0,
-				y = 0,
-				z = 0;
+		enum ORIENTATION last_orientation = -1;
 
-        x = MMA1_GetX();
-        y = MMA1_GetY();
-        z = MMA1_GetZ();
+	    if(abs(MMA1_GetX()) >= GRAVITY_THRESHOLD &&
+	    		last_orientation != VERTICAL)
+	    {
+	    	last_orientation = VERTICAL;
+	    	event_buff_insert_event(ORIENTATION_CHANG_TO_VER);
+	    }
+	    else if(abs(MMA1_GetY()) >= GRAVITY_THRESHOLD &&
+	    		last_orientation != LATERAL)
+	    {
+	    	last_orientation = LATERAL;
+	    	event_buff_insert_event(ORIENTATION_CHANG_TO_LAT);
+	    }
+	    else if(abs(MMA1_GetZ()) >= GRAVITY_THRESHOLD &&
+	    		last_orientation != HORIZONTAL)
+	    {
+	    	last_orientation = HORIZONTAL;
+	    	event_buff_insert_event(ORIENTATION_CHANG_TO_HOR);
+	    }
 
-        LEDR_Put(abs(x) > 2000);
-        LEDG_Put(abs(y) > 2000);
-        LEDB_Put(abs(z) > 2000);
-
-		if(!event_buff_is_empty())
-			event_handler(event_buff_consume_event());
-
+	    if(!event_buff_is_empty())
+	    			event_handler(event_buff_consume_event());
 	}
 
 	/*** Don't write any code pass this line, or it will be deleted during code generation. ***/
@@ -105,7 +113,7 @@ int main(void)
   /*** Processor Expert end of main routine. DON'T MODIFY THIS CODE!!! ***/
   for(;;){}
   /*** Processor Expert end of main routine. DON'T WRITE CODE BELOW!!! ***/
-} /*** End of main routine. DO NOT MODIFY THIS TEXT!!! ***/
+} /*** 	End of main routine. DO NOT MODIFY THIS TEXT!!! ***/
 
 /* END main */
 /*!

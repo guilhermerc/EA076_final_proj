@@ -20,10 +20,10 @@
 #include <PE_Types.h>
 #include <PORT_PDD.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <TI1.h>
 #include <UART0.h>
 #include <UART2.h>
-#include "CPU.h"
 #include "Events.h"
 
 #ifdef __cplusplus

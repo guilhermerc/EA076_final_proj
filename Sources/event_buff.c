@@ -8,8 +8,9 @@
 
 #include <comm.h>
 #include <event_buff.h>
-//#include <GREEN_LED.h>
-//#include <RED_LED.h>
+#include <LEDB.h>
+#include <LEDG.h>
+#include <LEDR.h>
 #include <UART0.h>
 #include <UART2.h>
 
@@ -178,6 +179,27 @@ void event_handler(EVENT_BUFF_TYPE event)
 	}
 	else if(event == DOUBLE_FINGER_SNAPPING)
 	{
+		//GREEN_LED_NegVal();
+	}
+	else if(event == ORIENTATION_CHANG_TO_HOR)
+	{
+		LEDR_On();
+		LEDG_Off();
+		LEDB_Off();
+		//GREEN_LED_NegVal();
+	}
+	else if(event == ORIENTATION_CHANG_TO_LAT)
+	{
+		LEDR_Off();
+		LEDG_On();
+		LEDB_Off();
+		//GREEN_LED_NegVal();
+	}
+	else if(event == ORIENTATION_CHANG_TO_VER)
+	{
+		LEDR_Off();
+		LEDG_Off();
+		LEDB_On();
 		//GREEN_LED_NegVal();
 	}
 }
