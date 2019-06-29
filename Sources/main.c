@@ -38,7 +38,13 @@
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
 
-enum ORIENTATION { HORIZONTAL, LATERAL, VERTICAL };
+enum ORIENTATION
+{
+	HORIZONTAL_UPWARDS,
+	HORIZONTAL_DOWNWARDS,
+	LATERAL,
+	VERTICAL
+};
 
 #define GRAVITY_THRESHOLD	2000
 
@@ -52,6 +58,7 @@ int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
 {
 	/* Write your local variable definition here */
+	enum ORIENTATION last_orientation = -1;
 
 	/*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
 	PE_low_level_init();
@@ -79,8 +86,6 @@ int main(void)
 	 */
 	for(;;)
 	{
-		enum ORIENTATION last_orientation = -1;
-
 	    if(abs(MMA1_GetX()) >= GRAVITY_THRESHOLD &&
 	    		last_orientation != VERTICAL)
 	    {
@@ -93,11 +98,17 @@ int main(void)
 	    	last_orientation = LATERAL;
 	    	event_buff_insert_event(ORIENTATION_CHANG_TO_LAT);
 	    }
-	    else if(abs(MMA1_GetZ()) >= GRAVITY_THRESHOLD &&
-	    		last_orientation != HORIZONTAL)
+	    else if(MMA1_GetZ() >= GRAVITY_THRESHOLD &&
+	    		last_orientation != HORIZONTAL_UPWARDS)
 	    {
-	    	last_orientation = HORIZONTAL;
-	    	event_buff_insert_event(ORIENTATION_CHANG_TO_HOR);
+	    	last_orientation = HORIZONTAL_UPWARDS;
+	    	event_buff_insert_event(ORIENTATION_CHANG_TO_HOR_UP);
+	    }
+	    else if(MMA1_GetZ() <= -GRAVITY_THRESHOLD &&
+	    		last_orientation != HORIZONTAL_DOWNWARDS)
+	    {
+	    	last_orientation = HORIZONTAL_DOWNWARDS;
+	    	event_buff_insert_event(ORIENTATION_CHANG_TO_HOR_DOWN);
 	    }
 
 	    if(!event_buff_is_empty())

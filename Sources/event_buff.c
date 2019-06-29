@@ -8,6 +8,7 @@
 
 #include <comm.h>
 #include <event_buff.h>
+#include <fsm.h>
 #include <LEDB.h>
 #include <LEDG.h>
 #include <LEDR.h>
@@ -175,31 +176,42 @@ void event_handler(EVENT_BUFF_TYPE event)
 	}
 	else if(event == SINGLE_FINGER_SNAPPING)
 	{
-		//RED_LED_NegVal();
+		fsm_iterate(SINGLE_FINGER_SNAPPING);
 	}
 	else if(event == DOUBLE_FINGER_SNAPPING)
 	{
-		//GREEN_LED_NegVal();
+		fsm_iterate(DOUBLE_FINGER_SNAPPING);
 	}
-	else if(event == ORIENTATION_CHANG_TO_HOR)
+	else if(event == ORIENTATION_CHANG_TO_HOR_UP)
 	{
 		LEDR_On();
 		LEDG_Off();
 		LEDB_Off();
-		//GREEN_LED_NegVal();
+
+		fsm_set_state(HORIZONTAL_UPWARDS_IDLE);
+	}
+	else if(event == ORIENTATION_CHANG_TO_HOR_DOWN)
+	{
+		LEDR_On();
+		LEDG_Off();
+		LEDB_Off();
+
+		fsm_set_state(HORIZONTAL_DOWNWARDS_IDLE);
 	}
 	else if(event == ORIENTATION_CHANG_TO_LAT)
 	{
 		LEDR_Off();
 		LEDG_On();
 		LEDB_Off();
-		//GREEN_LED_NegVal();
+
+		fsm_set_state(LATERAL_IDLE);
 	}
 	else if(event == ORIENTATION_CHANG_TO_VER)
 	{
 		LEDR_Off();
 		LEDG_Off();
 		LEDB_On();
-		//GREEN_LED_NegVal();
+
+		fsm_set_state(VERTICAL_IDLE_ZOOM_MODE);
 	}
 }
