@@ -6,7 +6,7 @@
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-28, 11:06, # CodeGen: 46
+**     Date/Time   : 2019-06-30, 16:16, # CodeGen: 60
 **     Abstract    :
 **
 **     Settings    :
@@ -62,9 +62,9 @@
   #include "MCUC1.h"
   #include "KY_038.h"
   #include "ExtIntLdd1.h"
-  #include "TI1.h"
+  #include "TI2.h"
   #include "TimerIntLdd1.h"
-  #include "TU1.h"
+  #include "TU2.h"
   #include "DEBOUNCING.h"
   #include "MMA1.h"
   #include "WAIT1.h"
@@ -79,6 +79,8 @@
   #include "LEDB.h"
   #include "LEDpin3.h"
   #include "BitIoLdd3.h"
+  #include "TU1.h"
+  #include "TRIG.h"
   #include "Events.h"
 
 
@@ -131,9 +133,9 @@
     (tIsrFunc)&ASerialLdd2_Interrupt,  /* 0x1E  0x00000078   2   ivINT_UART2                   used by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x1F  0x0000007C   -   ivINT_ADC0                    unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x20  0x00000080   -   ivINT_CMP0                    unused by PE */
-    (tIsrFunc)&CPU_Interrupt,          /* 0x21  0x00000084   -   ivINT_TPM0                    unused by PE */
+    (tIsrFunc)&TU1_Interrupt,          /* 0x21  0x00000084   2   ivINT_TPM0                    used by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x22  0x00000088   -   ivINT_TPM1                    unused by PE */
-    (tIsrFunc)&TU1_Interrupt,          /* 0x23  0x0000008C   2   ivINT_TPM2                    used by PE */
+    (tIsrFunc)&TU2_Interrupt,          /* 0x23  0x0000008C   2   ivINT_TPM2                    used by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x24  0x00000090   -   ivINT_RTC                     unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x25  0x00000094   -   ivINT_RTC_Seconds             unused by PE */
     (tIsrFunc)&CPU_Interrupt,          /* 0x26  0x00000098   -   ivINT_PIT                     unused by PE */

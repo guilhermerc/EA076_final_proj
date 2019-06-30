@@ -6,7 +6,7 @@
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-28, 11:06, # CodeGen: 46
+**     Date/Time   : 2019-06-30, 16:16, # CodeGen: 60
 **     Abstract    :
 **
 **     Settings    :
@@ -68,9 +68,9 @@
 #include "MCUC1.h"
 #include "KY_038.h"
 #include "ExtIntLdd1.h"
-#include "TI1.h"
+#include "TI2.h"
 #include "TimerIntLdd1.h"
-#include "TU1.h"
+#include "TU2.h"
 #include "DEBOUNCING.h"
 #include "MMA1.h"
 #include "WAIT1.h"
@@ -85,6 +85,8 @@
 #include "LEDB.h"
 #include "LEDpin3.h"
 #include "BitIoLdd3.h"
+#include "TU1.h"
+#include "TRIG.h"
 
 
 /*

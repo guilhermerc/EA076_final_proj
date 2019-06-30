@@ -32,9 +32,14 @@
 #include <CPU.h>
 #include <event_buff.h>
 #include <KY_038.h>
+#include <LEDB.h>
+#include <LEDG.h>
+#include <LEDR.h>
 #include <MMA1.h>
-#include <stdlib.h>
-#include <TI1.h>
+#include <stdint.h>
+#include <TI2.h>
+#include <Ultrasonic.h>
+#include <WAIT1.h>
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
 
@@ -47,6 +52,8 @@ enum ORIENTATION
 };
 
 #define GRAVITY_THRESHOLD	2000
+#define PARASITIC_ECHO_AVOIDANCE	50
+#define AMBIENT_TEMPERATURE	22
 
 /* TODO: Read about the KY-038 sensor
  * TODO: Test if it's possible to connect to the MQTT Broker hosted in my
@@ -59,6 +66,7 @@ int main(void)
 {
 	/* Write your local variable definition here */
 	enum ORIENTATION last_orientation = -1;
+	uint16_t distance = 0;
 
 	/*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
 	PE_low_level_init();
@@ -76,9 +84,10 @@ int main(void)
 	comm_init();
 
 	KY_038_Enable();
-	TI1_Enable();
+	TI2_Enable();
 
 	MMA1_Init();
+	US_Init();
 
 	/*!
 	 * Infinite loop that checks if the event ring buffer has events to
@@ -86,6 +95,7 @@ int main(void)
 	 */
 	for(;;)
 	{
+		/*
 	    if(abs(MMA1_GetX()) >= GRAVITY_THRESHOLD &&
 	    		last_orientation != VERTICAL)
 	    {
@@ -113,6 +123,15 @@ int main(void)
 
 	    if(!event_buff_is_empty())
 	    			event_handler(event_buff_consume_event());
+		*/
+
+	    distance = US_usToCentimeters(US_Measure_us(), AMBIENT_TEMPERATURE);
+
+	    LEDR_Put(distance < 10);
+	    LEDG_Put(distance >= 10 && distance <= 50);
+	    LEDB_Put(distance > 50 && distance <= 100);
+
+	    WAIT1_Waitms(PARASITIC_ECHO_AVOIDANCE);
 	}
 
 	/*** Don't write any code pass this line, or it will be deleted during code generation. ***/

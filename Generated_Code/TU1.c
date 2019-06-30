@@ -7,32 +7,41 @@
 **     Version     : Component 01.164, Driver 01.11, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-16, 18:57, # CodeGen: 23
+**     Date/Time   : 2019-06-30, 16:13, # CodeGen: 59
 **     Abstract    :
 **          This TimerUnit component provides a low level API for unified hardware access across
 **          various timer devices using the Prescaler-Counter-Compare-Capture timer structure.
 **     Settings    :
 **          Component name                                 : TU1
-**          Module name                                    : TPM2
-**          Counter                                        : TPM2_CNT
+**          Module name                                    : TPM0
+**          Counter                                        : TPM0_CNT
 **          Counter direction                              : Up
 **          Counter width                                  : 16 bits
-**          Value type                                     : uint16_t
+**          Value type                                     : Optimal
 **          Input clock source                             : Internal
-**            Counter frequency                            : Auto select
-**          Counter restart                                : On-match
-**            Period device                                : TPM2_MOD
-**            Period                                       : 100 ms
+**            Counter frequency                            : 10.48576 MHz
+**          Counter restart                                : On-overrun
+**            Overrun period                               : Auto select
 **            Interrupt                                    : Enabled
-**              Interrupt                                  : INT_TPM2
+**              Interrupt                                  : INT_TPM0
 **              Interrupt priority                         : medium priority
-**          Channel list                                   : 0
+**          Channel list                                   : 1
+**            Channel 0                                    : 
+**              Mode                                       : Capture
+**                Capture                                  : TPM0_C4V
+**                Capture input pin                        : PTD4/LLWU_P14/SPI1_PCS0/UART2_RX/TPM0_CH4
+**                Capture input signal                     : US_Echo_D2
+**                Edge                                     : both edges
+**                Maximum time of event                    : 6.249971712 ms
+**                Interrupt                                : Enabled
+**                  Interrupt                              : INT_TPM0
+**                  Interrupt priority                     : medium priority
 **          Initialization                                 : 
-**            Enabled in init. code                        : no
+**            Enabled in init. code                        : yes
 **            Auto initialization                          : no
 **            Event mask                                   : 
-**              OnCounterRestart                           : Disabled
-**              OnChannel0                                 : Disabled
+**              OnCounterRestart                           : Enabled
+**              OnChannel0                                 : Enabled
 **              OnChannel1                                 : Disabled
 **              OnChannel2                                 : Disabled
 **              OnChannel3                                 : Disabled
@@ -50,10 +59,10 @@
 **            Clock configuration 6                        : This component disabled
 **            Clock configuration 7                        : This component disabled
 **     Contents    :
-**         Init         - LDD_TDeviceData* TU1_Init(LDD_TUserData *UserDataPtr);
-**         Enable       - LDD_TError TU1_Enable(LDD_TDeviceData *DeviceDataPtr);
-**         Disable      - LDD_TError TU1_Disable(LDD_TDeviceData *DeviceDataPtr);
-**         SetEventMask - LDD_TError TU1_SetEventMask(LDD_TDeviceData *DeviceDataPtr, LDD_TEventMask...
+**         Init            - LDD_TDeviceData* TU1_Init(LDD_TUserData *UserDataPtr);
+**         Deinit          - void TU1_Deinit(LDD_TDeviceData *DeviceDataPtr);
+**         ResetCounter    - LDD_TError TU1_ResetCounter(LDD_TDeviceData *DeviceDataPtr);
+**         GetCaptureValue - LDD_TError TU1_GetCaptureValue(LDD_TDeviceData *DeviceDataPtr, uint8_t...
 **
 **     Copyright : 1997 - 2015 Freescale Semiconductor, Inc. 
 **     All Rights Reserved.
@@ -100,7 +109,7 @@
 
 /* MODULE TU1. */
 
-#include "TimerIntLdd1.h"
+#include "Events.h"
 #include "TU1.h"
 /* {Default RTOS Adapter} No RTOS includes */
 #include "IO_Map.h"
@@ -109,11 +118,15 @@
 extern "C" {
 #endif 
 
+/* List of channels used by component */
+static const uint8_t ChannelDevice[TU1_NUMBER_OF_CHANNELS] = {0x04U};
+
+/* Table of channels mode / 0 - compare mode, 1 - capture mode */
+static const uint8_t ChannelMode[TU1_NUMBER_OF_CHANNELS] = {0x01U};
+
 
 typedef struct {
   LDD_TEventMask EnEvents;             /* Enable/Disable events mask */
-  uint32_t Source;                     /* Current source clock */
-  uint8_t InitCntr;                    /* Number of initialization */
   LDD_TUserData *UserDataPtr;          /* RTOS device data structure */
 } TU1_TDeviceData;
 
@@ -122,9 +135,11 @@ typedef TU1_TDeviceData *TU1_TDeviceDataPtr; /* Pointer to the device data struc
 /* {Default RTOS Adapter} Static object used for simulation of dynamic driver memory allocation */
 static TU1_TDeviceData DeviceDataPrv__DEFAULT_RTOS_ALLOC;
 /* {Default RTOS Adapter} Global variable used for passing a parameter into ISR */
-static TU1_TDeviceDataPtr INT_TPM2__DEFAULT_RTOS_ISRPARAM;
+static TU1_TDeviceDataPtr INT_TPM0__DEFAULT_RTOS_ISRPARAM;
 
-#define AVAILABLE_EVENTS_MASK (LDD_TEventMask)(LDD_TIMERUNIT_ON_COUNTER_RESTART)
+#define AVAILABLE_EVENTS_MASK (LDD_TEventMask)(LDD_TIMERUNIT_ON_CHANNEL_0 | LDD_TIMERUNIT_ON_COUNTER_RESTART)
+#define AVAILABLE_PIN_MASK (LDD_TPinMask)(TU1_CHANNEL_0_PIN)
+#define LAST_CHANNEL 0x00U
 
 /* Internal method prototypes */
 /*
@@ -153,49 +168,54 @@ static TU1_TDeviceDataPtr INT_TPM2__DEFAULT_RTOS_ISRPARAM;
 /* ===================================================================*/
 LDD_TDeviceData* TU1_Init(LDD_TUserData *UserDataPtr)
 {
+  /* Allocate device structure */
   TU1_TDeviceData *DeviceDataPrv;
-
-  if (PE_LDD_DeviceDataList[PE_LDD_COMPONENT_TU1_ID] == NULL) {
-    /* Allocate device structure */
-    /* {Default RTOS Adapter} Driver memory allocation: Dynamic allocation is simulated by a pointer to the static object */
-    DeviceDataPrv = &DeviceDataPrv__DEFAULT_RTOS_ALLOC;
-    DeviceDataPrv->UserDataPtr = UserDataPtr; /* Store the RTOS device structure */
-    DeviceDataPrv->InitCntr = 1U;      /* First initialization */
-  }
-  else {
-    /* Memory is already allocated */
-    DeviceDataPrv = (TU1_TDeviceDataPtr) PE_LDD_DeviceDataList[PE_LDD_COMPONENT_TU1_ID];
-    DeviceDataPrv->UserDataPtr = UserDataPtr; /* Store the RTOS device structure */
-    DeviceDataPrv->InitCntr++;         /* Increment counter of initialization */
-    return ((LDD_TDeviceData *)DeviceDataPrv); /* Return pointer to the device data structure */
-  }
+  /* {Default RTOS Adapter} Driver memory allocation: Dynamic allocation is simulated by a pointer to the static object */
+  DeviceDataPrv = &DeviceDataPrv__DEFAULT_RTOS_ALLOC;
+  DeviceDataPrv->UserDataPtr = UserDataPtr; /* Store the RTOS device structure */
   /* Interrupt vector(s) allocation */
   /* {Default RTOS Adapter} Set interrupt vector: IVT is static, ISR parameter is passed by the global variable */
-  INT_TPM2__DEFAULT_RTOS_ISRPARAM = DeviceDataPrv;
-  /* SIM_SCGC6: TPM2=1 */
-  SIM_SCGC6 |= SIM_SCGC6_TPM2_MASK;
-  /* TPM2_SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,DMA=0,TOF=0,TOIE=0,CPWMS=0,CMOD=0,PS=0 */
-  TPM2_SC = (TPM_SC_CMOD(0x00) | TPM_SC_PS(0x00)); /* Clear status and control register */
-  /* TPM2_CNT: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,COUNT=0 */
-  TPM2_CNT = TPM_CNT_COUNT(0x00);      /* Reset counter register */
-  /* TPM2_C0SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=0,MSB=0,MSA=0,ELSB=0,ELSA=0,??=0,DMA=0 */
-  TPM2_C0SC = 0x00U;                   /* Clear channel status and control register */
-  /* TPM2_C1SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=0,MSB=0,MSA=0,ELSB=0,ELSA=0,??=0,DMA=0 */
-  TPM2_C1SC = 0x00U;                   /* Clear channel status and control register */
-  /* TPM2_MOD: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,MOD=0xFFFF */
-  TPM2_MOD = TPM_MOD_MOD(0xFFFF);      /* Set up modulo register */
-  DeviceDataPrv->EnEvents = 0x00U;     /* Enable selected events */
-  DeviceDataPrv->Source = TPM_PDD_SYSTEM; /* Store clock source */
-  /* NVIC_IPR4: PRI_19=0x80 */
+  INT_TPM0__DEFAULT_RTOS_ISRPARAM = DeviceDataPrv;
+  /* SIM_SCGC6: TPM0=1 */
+  SIM_SCGC6 |= SIM_SCGC6_TPM0_MASK;
+  /* TPM0_SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,DMA=0,TOF=0,TOIE=0,CPWMS=0,CMOD=0,PS=0 */
+  TPM0_SC = (TPM_SC_CMOD(0x00) | TPM_SC_PS(0x00)); /* Clear status and control register */
+  /* TPM0_CNT: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,COUNT=0 */
+  TPM0_CNT = TPM_CNT_COUNT(0x00);      /* Reset counter register */
+  /* TPM0_C0SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=0,MSB=0,MSA=0,ELSB=0,ELSA=0,??=0,DMA=0 */
+  TPM0_C0SC = 0x00U;                   /* Clear channel status and control register */
+  /* TPM0_C1SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=0,MSB=0,MSA=0,ELSB=0,ELSA=0,??=0,DMA=0 */
+  TPM0_C1SC = 0x00U;                   /* Clear channel status and control register */
+  /* TPM0_C2SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=0,MSB=0,MSA=0,ELSB=0,ELSA=0,??=0,DMA=0 */
+  TPM0_C2SC = 0x00U;                   /* Clear channel status and control register */
+  /* TPM0_C3SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=0,MSB=0,MSA=0,ELSB=0,ELSA=0,??=0,DMA=0 */
+  TPM0_C3SC = 0x00U;                   /* Clear channel status and control register */
+  /* TPM0_C4SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=0,MSB=0,MSA=0,ELSB=0,ELSA=0,??=0,DMA=0 */
+  TPM0_C4SC = 0x00U;                   /* Clear channel status and control register */
+  /* TPM0_C5SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=0,MSB=0,MSA=0,ELSB=0,ELSA=0,??=0,DMA=0 */
+  TPM0_C5SC = 0x00U;                   /* Clear channel status and control register */
+  /* TPM0_MOD: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,MOD=0xFFFF */
+  TPM0_MOD = TPM_MOD_MOD(0xFFFF);      /* Set up modulo register */
+  /* TPM0_C4SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=1,MSB=0,MSA=0,ELSB=1,ELSA=1,??=0,DMA=0 */
+  TPM0_C4SC = (TPM_CnSC_CHIE_MASK | TPM_CnSC_ELSB_MASK | TPM_CnSC_ELSA_MASK); /* Set up channel status and control register */
+  /* PORTD_PCR4: ISF=0,MUX=4 */
+  PORTD_PCR4 = (uint32_t)((PORTD_PCR4 & (uint32_t)~(uint32_t)(
+                PORT_PCR_ISF_MASK |
+                PORT_PCR_MUX(0x03)
+               )) | (uint32_t)(
+                PORT_PCR_MUX(0x04)
+               ));
+  DeviceDataPrv->EnEvents = 0x0101U;   /* Enable selected events */
+  /* NVIC_IPR4: PRI_17=0x80 */
   NVIC_IPR4 = (uint32_t)((NVIC_IPR4 & (uint32_t)~(uint32_t)(
-               NVIC_IP_PRI_19(0x7F)
+               NVIC_IP_PRI_17(0x7F)
               )) | (uint32_t)(
-               NVIC_IP_PRI_19(0x80)
+               NVIC_IP_PRI_17(0x80)
               ));
-  /* NVIC_ISER: SETENA|=0x00080000 */
-  NVIC_ISER |= NVIC_ISER_SETENA(0x00080000);
-  /* TPM2_SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,DMA=0,TOF=0,TOIE=0,CPWMS=0,CMOD=0,PS=5 */
-  TPM2_SC = (TPM_SC_CMOD(0x00) | TPM_SC_PS(0x05)); /* Set up status and control register */
+  /* NVIC_ISER: SETENA|=0x00020000 */
+  NVIC_ISER |= NVIC_ISER_SETENA(0x00020000);
+  /* TPM0_SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,DMA=0,TOF=0,TOIE=1,CPWMS=0,CMOD=1,PS=1 */
+  TPM0_SC = (TPM_SC_TOIE_MASK | TPM_SC_CMOD(0x01) | TPM_SC_PS(0x01)); /* Set up status and control register */
   /* Registration of the device structure */
   PE_LDD_RegisterDeviceStructure(PE_LDD_COMPONENT_TU1_ID,DeviceDataPrv);
   return ((LDD_TDeviceData *)DeviceDataPrv); /* Return pointer to the device data structure */
@@ -203,105 +223,101 @@ LDD_TDeviceData* TU1_Init(LDD_TUserData *UserDataPtr)
 
 /*
 ** ===================================================================
-**     Method      :  TU1_Enable (component TimerUnit_LDD)
+**     Method      :  TU1_Deinit (component TimerUnit_LDD)
 */
 /*!
 **     @brief
-**         Enables the component - it starts the signal generation.
-**         Events may be generated (see SetEventMask). The method is
-**         not available if the counter can't be disabled/enabled by HW.
+**         Deinitializes the device. Switches off the device, frees the
+**         device data structure memory, interrupts vectors, etc.
 **     @param
 **         DeviceDataPtr   - Device data structure
-**                           pointer returned by [Init] method.
-**     @return
-**                         - Error code, possible codes:
-**                           ERR_OK - OK
-**                           ERR_SPEED - The component does not work in
-**                           the active clock configuration
+**                           pointer returned by Init method
 */
 /* ===================================================================*/
-LDD_TError TU1_Enable(LDD_TDeviceData *DeviceDataPtr)
+void TU1_Deinit(LDD_TDeviceData *DeviceDataPtr)
 {
   TU1_TDeviceData *DeviceDataPrv = (TU1_TDeviceData *)DeviceDataPtr;
 
-  TPM_PDD_SelectPrescalerSource(TPM2_BASE_PTR, DeviceDataPrv->Source); /* Enable the device */
-  return ERR_OK;
+  (void)DeviceDataPrv;
+  TPM_PDD_SelectPrescalerSource(TPM0_BASE_PTR, TPM_PDD_DISABLED);
+  /* Interrupt vector(s) deallocation */
+  /* {Default RTOS Adapter} Restore interrupt vector: IVT is static, no code is generated */
+  /* Unregistration of the device structure */
+  PE_LDD_UnregisterDeviceStructure(PE_LDD_COMPONENT_TU1_ID);
+  /* Deallocation of the device structure */
+  /* {Default RTOS Adapter} Driver memory deallocation: Dynamic allocation is simulated, no deallocation code is generated */
 }
 
 /*
 ** ===================================================================
-**     Method      :  TU1_Disable (component TimerUnit_LDD)
+**     Method      :  TU1_ResetCounter (component TimerUnit_LDD)
 */
 /*!
 **     @brief
-**         Disables the component - it stops signal generation and
-**         events calling. The method is not available if the counter
-**         can't be disabled/enabled by HW.
+**         Resets counter. If counter is counting up then it is set to
+**         zero. If counter is counting down then counter is updated to
+**         the reload value.
+**         The method is not available if HW doesn't allow resetting of
+**         the counter.
 **     @param
 **         DeviceDataPtr   - Device data structure
 **                           pointer returned by [Init] method.
 **     @return
 **                         - Error code, possible codes:
-**                           ERR_OK - OK
+**                           ERR_OK - OK 
 **                           ERR_SPEED - The component does not work in
 **                           the active clock configuration
 */
 /* ===================================================================*/
-LDD_TError TU1_Disable(LDD_TDeviceData *DeviceDataPtr)
+LDD_TError TU1_ResetCounter(LDD_TDeviceData *DeviceDataPtr)
 {
   (void)DeviceDataPtr;                 /* Parameter is not used, suppress unused argument warning */
-  TPM_PDD_SelectPrescalerSource(TPM2_BASE_PTR, TPM_PDD_DISABLED);
-  return ERR_OK;
+  TPM_PDD_InitializeCounter(TPM0_BASE_PTR);
+  return ERR_OK;                       /* OK */
 }
 
 /*
 ** ===================================================================
-**     Method      :  TU1_SetEventMask (component TimerUnit_LDD)
+**     Method      :  TU1_GetCaptureValue (component TimerUnit_LDD)
 */
 /*!
 **     @brief
-**         Enables/disables event(s). The events contained within the
-**         mask are enabled. Events not contained within the mask are
-**         disabled. The component event masks are defined in the
-**         PE_Types.h file. Note: Event that are not generated (See the
-**         "Events" tab in the Component inspector) are not handled by
-**         this method. In this case the method returns ERR_PARAM_MASK
-**         error code. See also method [GetEventMask].
+**         Returns the content of capture register specified by the
+**         parameter ChannelIdx. This method is available when at least
+**         one channel is configured.
 **     @param
 **         DeviceDataPtr   - Device data structure
 **                           pointer returned by [Init] method.
 **     @param
-**         EventMask       - Event mask
+**         ChannelIdx      - Index of the component
+**                           channel.
+**     @param
+**         ValuePtr        - Pointer to return value of the
+**                           capture register.
 **     @return
 **                         - Error code, possible codes:
-**                           ERR_OK - OK
+**                           ERR_OK - OK 
+**                           ERR_PARAM_INDEX - ChannelIdx parameter is
+**                           out of possible range
+**                           ERR_NOTAVAIL -  The capture mode is not
+**                           selected for selected channel.
 **                           ERR_SPEED - The component does not work in
 **                           the active clock configuration
-**                           ERR_PARAM_MASK - Event mask is not valid
 */
 /* ===================================================================*/
-LDD_TError TU1_SetEventMask(LDD_TDeviceData *DeviceDataPtr, LDD_TEventMask EventMask)
+LDD_TError TU1_GetCaptureValue(LDD_TDeviceData *DeviceDataPtr, uint8_t ChannelIdx, TU1_TValueType *ValuePtr)
 {
-  TU1_TDeviceData *DeviceDataPrv = (TU1_TDeviceData *)DeviceDataPtr;
-
-  /* Event mask test - this test can be disabled by setting the "Ignore range checking"
+  (void)DeviceDataPtr;                 /* Parameter is not used, suppress unused argument warning */
+  /* Parameter test - this test can be disabled by setting the "Ignore range checking"
      property to the "yes" value in the "Configuration inspector" */
-  if ((EventMask & ((LDD_TEventMask)~AVAILABLE_EVENTS_MASK)) != 0U) {
-    return ERR_PARAM_MASK;
+  if (ChannelIdx > LAST_CHANNEL) {     /* Is the channel index out of range? */
+    return ERR_PARAM_INDEX;            /* If yes then error */
   }
-  /* {Default RTOS Adapter} Critical section begin, general PE function is used */
-  EnterCritical();
-  if ((EventMask & LDD_TIMERUNIT_ON_COUNTER_RESTART) != 0U) { /* Is the event enabled? */
-    TPM_PDD_ClearOverflowInterruptFlag(TPM2_BASE_PTR); /* If yes then clear flag */
-    TPM_PDD_EnableOverflowInterrupt(TPM2_BASE_PTR); /* and enable interrupt */
+  if ((ChannelMode[ChannelIdx]) != 1u) { /* Is the channel in capture mode? */
+    return ERR_NOTAVAIL;               /* If not then error */
   }
-  else {
-    TPM_PDD_DisableOverflowInterrupt(TPM2_BASE_PTR); /* Disable overflow interrupt */
-  }
-  DeviceDataPrv->EnEvents = EventMask;
-  /* {Default RTOS Adapter} Critical section end, general PE function is used */
-  ExitCritical();
-  return ERR_OK;
+  *ValuePtr = (TU1_TValueType)(TPM_PDD_ReadChannelValueReg(TPM0_BASE_PTR, ChannelDevice[ChannelIdx]));
+  return ERR_OK;                       /* OK */
 }
 
 /*
@@ -317,17 +333,24 @@ LDD_TError TU1_SetEventMask(LDD_TDeviceData *DeviceDataPtr, LDD_TEventMask Event
 PE_ISR(TU1_Interrupt)
 {
   /* {Default RTOS Adapter} ISR parameter is passed through the global variable */
-  TU1_TDeviceDataPtr DeviceDataPrv = INT_TPM2__DEFAULT_RTOS_ISRPARAM;
+  TU1_TDeviceDataPtr DeviceDataPrv = INT_TPM0__DEFAULT_RTOS_ISRPARAM;
 
   LDD_TEventMask State = 0U;
 
-  if ((TPM_PDD_GetOverflowInterruptFlag(TPM2_BASE_PTR)) != 0U) { /* Is the overflow interrupt flag pending? */
+  if ((TPM_PDD_GetOverflowInterruptFlag(TPM0_BASE_PTR)) != 0U) { /* Is the overflow interrupt flag pending? */
     State |= LDD_TIMERUNIT_ON_COUNTER_RESTART; /* and set mask */
+  }
+  if ((TPM_PDD_GetChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[0])) != 0U) { /* Is the channel interrupt flag pending? */
+    State |= LDD_TIMERUNIT_ON_CHANNEL_0; /* and set mask */
   }
   State &= DeviceDataPrv->EnEvents;    /* Handle only enabled interrupts */
   if (State & LDD_TIMERUNIT_ON_COUNTER_RESTART) { /* Is the overflow interrupt flag pending? */
-    TPM_PDD_ClearOverflowInterruptFlag(TPM2_BASE_PTR); /* Clear flag */
+    TPM_PDD_ClearOverflowInterruptFlag(TPM0_BASE_PTR); /* Clear flag */
     TU1_OnCounterRestart(DeviceDataPrv->UserDataPtr); /* Invoke OnCounterRestart event */
+  }
+  if (State & LDD_TIMERUNIT_ON_CHANNEL_0) { /* Is the channel 0 interrupt flag pending? */
+    TPM_PDD_ClearChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[0]); /* Clear flag */
+    TU1_OnChannel0(DeviceDataPrv->UserDataPtr); /* Invoke OnChannel0 event */
   }
 }
 

@@ -8,7 +8,7 @@
 **     Repository  : Kinetis
 **     Datasheet   : KL25P80M48SF0RM, Rev.3, Sep 2012
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-28, 11:06, # CodeGen: 46
+**     Date/Time   : 2019-06-30, 16:16, # CodeGen: 60
 **     Abstract    :
 **
 **     Settings    :
@@ -256,9 +256,9 @@
 #include "MCUC1.h"
 #include "KY_038.h"
 #include "ExtIntLdd1.h"
-#include "TI1.h"
+#include "TI2.h"
 #include "TimerIntLdd1.h"
-#include "TU1.h"
+#include "TU2.h"
 #include "DEBOUNCING.h"
 #include "MMA1.h"
 #include "WAIT1.h"
@@ -273,6 +273,8 @@
 #include "LEDB.h"
 #include "LEDpin3.h"
 #include "BitIoLdd3.h"
+#include "TU1.h"
+#include "TRIG.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"
@@ -489,7 +491,7 @@ void PE_low_level_init(void)
   (void)ExtIntLdd1_Init(NULL);
   /* ### TimerInt_LDD "TimerIntLdd1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
   (void)TimerIntLdd1_Init(NULL);
-  /* ### TimerInt "TI1" init code ... */
+  /* ### TimerInt "TI2" init code ... */
   DEBOUNCING_Init(); /* ### Wait "DEBOUNCING" init code ... */
   WAIT1_Init(); /* ### Wait "WAIT1" init code ... */
   /* ### I2C_LDD "CI2C1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */

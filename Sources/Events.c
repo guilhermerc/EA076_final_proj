@@ -21,7 +21,7 @@
 #include <PORT_PDD.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <TI1.h>
+#include <TI2.h>
 #include <UART0.h>
 #include <UART2.h>
 #include "Events.h"
@@ -31,8 +31,9 @@ extern "C" {
 #endif 
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
+#include "Ultrasonic.h"
 
-#define	TIMEOUT	10 // 600 ms of timeout. TODO: Check if this is a good value.
+#define	TIMEOUT	10 // 600 ms of timeo	ut. TODO: Check if this is a good value.
 #define DEBOUNCING_TIMEOUT	100
 
 /* A static variable that counts how many 100 ms timer interruptions have
@@ -267,7 +268,7 @@ void KY_038_OnInterrupt(void)
 	if(snapping_counter == 0)
 	{
 		timeout_counter = 0;
-		TI1_EnableEvent();
+		TI2_EnableEvent();
 	}
 
 	snapping_counter++;	// And increment the number of snappings
@@ -279,9 +280,9 @@ void KY_038_OnInterrupt(void)
 
 /*
 ** ===================================================================
-**     Event       :  TI1_OnInterrupt (module Events)
+**     Event       :  TI2_OnInterrupt (module Events)
 **
-**     Component   :  TI1 [TimerInt]
+**     Component   :  TI2 [TimerInt]
 **     Description :
 **         When a timer interrupt occurs this event is called (only
 **         when the component is enabled - <Enable> and the events are
@@ -291,7 +292,7 @@ void KY_038_OnInterrupt(void)
 **     Returns     : Nothing
 ** ===================================================================
 */
-void TI1_OnInterrupt(void)
+void TI2_OnInterrupt(void)
 {
   	timeout_counter++;
 
@@ -308,8 +309,56 @@ void TI1_OnInterrupt(void)
 
   		snapping_counter = 0;
 
-  		TI1_DisableEvent();
+  		TI2_DisableEvent();
   	}
+}
+
+/*
+** ===================================================================
+**     Event       :  TU1_OnCounterRestart (module Events)
+**
+**     Component   :  TU1 [TimerUnit_LDD]
+*/
+/*!
+**     @brief
+**         Called if counter overflow/underflow or counter is
+**         reinitialized by modulo or compare register matching.
+**         OnCounterRestart event and Timer unit must be enabled. See
+**         [SetEventMask] and [GetEventMask] methods. This event is
+**         available only if a [Interrupt] is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. The pointer passed as
+**                           the parameter of Init method.
+*/
+/* ===================================================================*/
+void TU1_OnCounterRestart(LDD_TUserData *UserDataPtr)
+{
+	US_EventEchoOverflow(UserDataPtr);
+}
+
+/*
+** ===================================================================
+**     Event       :  TU1_OnChannel0 (module Events)
+**
+**     Component   :  TU1 [TimerUnit_LDD]
+*/
+/*!
+**     @brief
+**         Called if compare register match the counter registers or
+**         capture register has a new content. OnChannel0 event and
+**         Timer unit must be enabled. See [SetEventMask] and
+**         [GetEventMask] methods. This event is available only if a
+**         [Interrupt] is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. The pointer passed as
+**                           the parameter of Init method.
+*/
+/* ===================================================================*/
+void TU1_OnChannel0(LDD_TUserData *UserDataPtr)
+{
+	US_EventEchoCapture(UserDataPtr);
 }
 
 /* END Events */

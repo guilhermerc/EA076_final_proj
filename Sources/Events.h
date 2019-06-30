@@ -16,6 +16,7 @@
 #define __Events_H
 /* MODULE Events */
 
+#include <PE_Types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -162,9 +163,9 @@ void KY_038_OnInterrupt(void);
 
 /*
 ** ===================================================================
-**     Event       :  TI1_OnInterrupt (module Events)
+**     Event       :  TI2_OnInterrupt (module Events)
 **
-**     Component   :  TI1 [TimerInt]
+**     Component   :  TI2 [TimerInt]
 **     Description :
 **         When a timer interrupt occurs this event is called (only
 **         when the component is enabled - <Enable> and the events are
@@ -174,7 +175,71 @@ void KY_038_OnInterrupt(void);
 **     Returns     : Nothing
 ** ===================================================================
 */
-void TI1_OnInterrupt(void);
+void TI2_OnInterrupt(void);
+
+
+void TU2_OnChannel0(LDD_TUserData *UserDataPtr);
+/*
+** ===================================================================
+**     Event       :  TU2_OnChannel0 (module Events)
+**
+**     Component   :  TU2 [TimerUnit_LDD]
+**     Description :
+**         Called if compare register match the counter registers or
+**         capture register has a new content. OnChannel0 event and
+**         Timer unit must be enabled. See <SetEventMask> and
+**         <GetEventMask> methods. This event is available only if a
+**         <Interrupt> is enabled.
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**       * UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. The pointer passed as
+**                           the parameter of Init method.
+**     Returns     : Nothing
+** ===================================================================
+*/
+
+/*
+** ===================================================================
+**     Event       :  TU1_OnCounterRestart (module Events)
+**
+**     Component   :  TU1 [TimerUnit_LDD]
+*/
+/*!
+**     @brief
+**         Called if counter overflow/underflow or counter is
+**         reinitialized by modulo or compare register matching.
+**         OnCounterRestart event and Timer unit must be enabled. See
+**         [SetEventMask] and [GetEventMask] methods. This event is
+**         available only if a [Interrupt] is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. The pointer passed as
+**                           the parameter of Init method.
+*/
+/* ===================================================================*/
+void TU1_OnCounterRestart(LDD_TUserData *UserDataPtr);
+
+/*
+** ===================================================================
+**     Event       :  TU1_OnChannel0 (module Events)
+**
+**     Component   :  TU1 [TimerUnit_LDD]
+*/
+/*!
+**     @brief
+**         Called if compare register match the counter registers or
+**         capture register has a new content. OnChannel0 event and
+**         Timer unit must be enabled. See [SetEventMask] and
+**         [GetEventMask] methods. This event is available only if a
+**         [Interrupt] is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. The pointer passed as
+**                           the parameter of Init method.
+*/
+/* ===================================================================*/
+void TU1_OnChannel0(LDD_TUserData *UserDataPtr);
 
 /* END Events */
 

@@ -7,7 +7,7 @@
 **     Version     : Component 01.018, Driver 01.02, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-16, 18:57, # CodeGen: 23
+**     Date/Time   : 2019-06-30, 15:48, # CodeGen: 55
 **     Abstract    :
 **          This TimerInt component implements a periodic interrupt.
 **          When the component and its events are enabled, the "OnInterrupt"
@@ -39,7 +39,7 @@
 **            Clock configuration 6                        : This component disabled
 **            Clock configuration 7                        : This component disabled
 **          Referenced components                          : 
-**            Linked TimerUnit                             : TU1
+**            Linked TimerUnit                             : TU2
 **     Contents    :
 **         Init         - LDD_TDeviceData* TimerIntLdd1_Init(LDD_TUserData *UserDataPtr);
 **         Enable       - LDD_TError TimerIntLdd1_Enable(LDD_TDeviceData *DeviceDataPtr);
@@ -96,7 +96,7 @@
 
 /* MODULE TimerIntLdd1. */
 
-#include "TI1.h"
+#include "TI2.h"
 #include "TimerIntLdd1.h"
 /* {Default RTOS Adapter} No RTOS includes */
 
@@ -151,7 +151,7 @@ LDD_TDeviceData* TimerIntLdd1_Init(LDD_TUserData *UserDataPtr)
   DeviceDataPrv->EnUser = FALSE;       /* Set the flag "device disabled" */
   /* Registration of the device structure */
   PE_LDD_RegisterDeviceStructure(PE_LDD_COMPONENT_TimerIntLdd1_ID,DeviceDataPrv);
-  DeviceDataPrv->LinkedDeviceDataPtr = TU1_Init((LDD_TUserData *)NULL);
+  DeviceDataPrv->LinkedDeviceDataPtr = TU2_Init((LDD_TUserData *)NULL);
   if (DeviceDataPrv->LinkedDeviceDataPtr == NULL) { /* Is initialization of TimerUnit unsuccessful? */
     /* Unregistration of the device structure */
     PE_LDD_UnregisterDeviceStructure(PE_LDD_COMPONENT_TimerIntLdd1_ID);
@@ -186,7 +186,7 @@ LDD_TError TimerIntLdd1_Enable(LDD_TDeviceData *DeviceDataPtr)
 
   if (!DeviceDataPrv->EnUser) {        /* Is the device disabled by user? */
     DeviceDataPrv->EnUser = TRUE;      /* If yes then set the flag "device enabled" */
-    (void)TU1_Enable(DeviceDataPrv->LinkedDeviceDataPtr); /* Enable TimerUnit */
+    (void)TU2_Enable(DeviceDataPrv->LinkedDeviceDataPtr); /* Enable TimerUnit */
   }
   return ERR_OK;
 }
@@ -215,7 +215,7 @@ LDD_TError TimerIntLdd1_Disable(LDD_TDeviceData *DeviceDataPtr)
 
   if (DeviceDataPrv->EnUser) {         /* Is the device enabled by user? */
     DeviceDataPrv->EnUser = FALSE;     /* If yes then set the flag "device enabled" */
-   (void)TU1_Disable(DeviceDataPrv->LinkedDeviceDataPtr); /* Disable TimerUnit component */
+   (void)TU2_Disable(DeviceDataPrv->LinkedDeviceDataPtr); /* Disable TimerUnit component */
   }
   return ERR_OK;
 }
@@ -255,20 +255,20 @@ LDD_TError TimerIntLdd1_SetEventMask(LDD_TDeviceData *DeviceDataPtr, LDD_TEventM
   if ((EventMask & ((LDD_TEventMask)~AVAILABLE_EVENTS_MASK)) != 0U) {
     return ERR_PARAM_MASK;
   }
-  return TU1_SetEventMask(DeviceDataPrv->LinkedDeviceDataPtr, ((EventMask & LDD_TIMERINT_ON_INTERRUPT) != 0U) ? LDD_TIMERUNIT_ON_COUNTER_RESTART : (LDD_TEventMask)0U);
+  return TU2_SetEventMask(DeviceDataPrv->LinkedDeviceDataPtr, ((EventMask & LDD_TIMERINT_ON_INTERRUPT) != 0U) ? LDD_TIMERUNIT_ON_COUNTER_RESTART : (LDD_TEventMask)0U);
 }
 
 /*
 ** ===================================================================
-**     Method      :  TU1_OnCounterRestart (component TimerInt_LDD)
+**     Method      :  TU2_OnCounterRestart (component TimerInt_LDD)
 **
 **     Description :
-**         The method services the event of the linked component TU1 and 
+**         The method services the event of the linked component TU2 and 
 **         eventually invokes event TimerIntLdd1_OnInterrupt.
 **         This method is internal. It is used by Processor Expert only.
 ** ===================================================================
 */
-void TU1_OnCounterRestart(LDD_TUserData *UserDataPtr)
+void TU2_OnCounterRestart(LDD_TUserData *UserDataPtr)
 {
   TimerIntLdd1_TDeviceData *DeviceDataPrv = PE_LDD_DeviceDataList[PE_LDD_COMPONENT_TimerIntLdd1_ID];
 

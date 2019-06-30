@@ -7,32 +7,41 @@
 **     Version     : Component 01.164, Driver 01.11, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-16, 18:57, # CodeGen: 23
+**     Date/Time   : 2019-06-30, 16:13, # CodeGen: 59
 **     Abstract    :
 **          This TimerUnit component provides a low level API for unified hardware access across
 **          various timer devices using the Prescaler-Counter-Compare-Capture timer structure.
 **     Settings    :
 **          Component name                                 : TU1
-**          Module name                                    : TPM2
-**          Counter                                        : TPM2_CNT
+**          Module name                                    : TPM0
+**          Counter                                        : TPM0_CNT
 **          Counter direction                              : Up
 **          Counter width                                  : 16 bits
-**          Value type                                     : uint16_t
+**          Value type                                     : Optimal
 **          Input clock source                             : Internal
-**            Counter frequency                            : Auto select
-**          Counter restart                                : On-match
-**            Period device                                : TPM2_MOD
-**            Period                                       : 100 ms
+**            Counter frequency                            : 10.48576 MHz
+**          Counter restart                                : On-overrun
+**            Overrun period                               : Auto select
 **            Interrupt                                    : Enabled
-**              Interrupt                                  : INT_TPM2
+**              Interrupt                                  : INT_TPM0
 **              Interrupt priority                         : medium priority
-**          Channel list                                   : 0
+**          Channel list                                   : 1
+**            Channel 0                                    : 
+**              Mode                                       : Capture
+**                Capture                                  : TPM0_C4V
+**                Capture input pin                        : PTD4/LLWU_P14/SPI1_PCS0/UART2_RX/TPM0_CH4
+**                Capture input signal                     : US_Echo_D2
+**                Edge                                     : both edges
+**                Maximum time of event                    : 6.249971712 ms
+**                Interrupt                                : Enabled
+**                  Interrupt                              : INT_TPM0
+**                  Interrupt priority                     : medium priority
 **          Initialization                                 : 
-**            Enabled in init. code                        : no
+**            Enabled in init. code                        : yes
 **            Auto initialization                          : no
 **            Event mask                                   : 
-**              OnCounterRestart                           : Disabled
-**              OnChannel0                                 : Disabled
+**              OnCounterRestart                           : Enabled
+**              OnChannel0                                 : Enabled
 **              OnChannel1                                 : Disabled
 **              OnChannel2                                 : Disabled
 **              OnChannel3                                 : Disabled
@@ -50,10 +59,10 @@
 **            Clock configuration 6                        : This component disabled
 **            Clock configuration 7                        : This component disabled
 **     Contents    :
-**         Init         - LDD_TDeviceData* TU1_Init(LDD_TUserData *UserDataPtr);
-**         Enable       - LDD_TError TU1_Enable(LDD_TDeviceData *DeviceDataPtr);
-**         Disable      - LDD_TError TU1_Disable(LDD_TDeviceData *DeviceDataPtr);
-**         SetEventMask - LDD_TError TU1_SetEventMask(LDD_TDeviceData *DeviceDataPtr, LDD_TEventMask...
+**         Init            - LDD_TDeviceData* TU1_Init(LDD_TUserData *UserDataPtr);
+**         Deinit          - void TU1_Deinit(LDD_TDeviceData *DeviceDataPtr);
+**         ResetCounter    - LDD_TError TU1_ResetCounter(LDD_TDeviceData *DeviceDataPtr);
+**         GetCaptureValue - LDD_TError TU1_GetCaptureValue(LDD_TDeviceData *DeviceDataPtr, uint8_t...
 **
 **     Copyright : 1997 - 2015 Freescale Semiconductor, Inc. 
 **     All Rights Reserved.
@@ -120,26 +129,27 @@ extern "C" {
 
 #ifndef __BWUserType_TU1_TValueType
 #define __BWUserType_TU1_TValueType
-  typedef uint16_t TU1_TValueType ;    /* Type for data parameters of methods */
+  typedef uint32_t TU1_TValueType ;    /* Type for data parameters of methods */
 #endif
-#define TU1_CNT_INP_FREQ_U_0 0x000A0000UL /* Counter input frequency in Hz */
-#define TU1_CNT_INP_FREQ_R_0 655359.9597346841F /* Counter input frequency in Hz */
+#define TU1_CNT_INP_FREQ_U_0 0x00A00000UL /* Counter input frequency in Hz */
+#define TU1_CNT_INP_FREQ_R_0 10485807.459603427F /* Counter input frequency in Hz */
 #define TU1_CNT_INP_FREQ_COUNT 0U      /* Count of predefined counter input frequencies */
 #define TU1_PERIOD_TICKS   0x00010000UL /* Initialization value of period in 'counter ticks' */
-#define TU1_NUMBER_OF_CHANNELS 0x00U   /* Count of predefined channels */
+#define TU1_NUMBER_OF_CHANNELS 0x01U   /* Count of predefined channels */
 #define TU1_COUNTER_WIDTH  0x10U       /* Counter width in bits  */
 #define TU1_COUNTER_DIR    DIR_UP      /* Direction of counting */
 /*! Peripheral base address of a device allocated by the component. This constant can be used directly in PDD macros. */
-#define TU1_PRPH_BASE_ADDRESS  0x4003A000U
+#define TU1_PRPH_BASE_ADDRESS  0x40038000U
   
 /* Methods configuration constants - generated for all enabled component's methods */
 #define TU1_Init_METHOD_ENABLED        /*!< Init method of the component TU1 is enabled (generated) */
-#define TU1_Enable_METHOD_ENABLED      /*!< Enable method of the component TU1 is enabled (generated) */
-#define TU1_Disable_METHOD_ENABLED     /*!< Disable method of the component TU1 is enabled (generated) */
-#define TU1_SetEventMask_METHOD_ENABLED /*!< SetEventMask method of the component TU1 is enabled (generated) */
+#define TU1_Deinit_METHOD_ENABLED      /*!< Deinit method of the component TU1 is enabled (generated) */
+#define TU1_ResetCounter_METHOD_ENABLED /*!< ResetCounter method of the component TU1 is enabled (generated) */
+#define TU1_GetCaptureValue_METHOD_ENABLED /*!< GetCaptureValue method of the component TU1 is enabled (generated) */
 
 /* Events configuration constants - generated for all enabled component's events */
 #define TU1_OnCounterRestart_EVENT_ENABLED /*!< OnCounterRestart event of the component TU1 is enabled (generated) */
+#define TU1_OnChannel0_EVENT_ENABLED   /*!< OnChannel0 event of the component TU1 is enabled (generated) */
 
 
 
@@ -171,73 +181,72 @@ LDD_TDeviceData* TU1_Init(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Method      :  TU1_Enable (component TimerUnit_LDD)
+**     Method      :  TU1_Deinit (component TimerUnit_LDD)
 */
 /*!
 **     @brief
-**         Enables the component - it starts the signal generation.
-**         Events may be generated (see SetEventMask). The method is
-**         not available if the counter can't be disabled/enabled by HW.
+**         Deinitializes the device. Switches off the device, frees the
+**         device data structure memory, interrupts vectors, etc.
 **     @param
 **         DeviceDataPtr   - Device data structure
-**                           pointer returned by [Init] method.
-**     @return
-**                         - Error code, possible codes:
-**                           ERR_OK - OK
-**                           ERR_SPEED - The component does not work in
-**                           the active clock configuration
+**                           pointer returned by Init method
 */
 /* ===================================================================*/
-LDD_TError TU1_Enable(LDD_TDeviceData *DeviceDataPtr);
+void TU1_Deinit(LDD_TDeviceData *DeviceDataPtr);
 
 /*
 ** ===================================================================
-**     Method      :  TU1_Disable (component TimerUnit_LDD)
+**     Method      :  TU1_ResetCounter (component TimerUnit_LDD)
 */
 /*!
 **     @brief
-**         Disables the component - it stops signal generation and
-**         events calling. The method is not available if the counter
-**         can't be disabled/enabled by HW.
+**         Resets counter. If counter is counting up then it is set to
+**         zero. If counter is counting down then counter is updated to
+**         the reload value.
+**         The method is not available if HW doesn't allow resetting of
+**         the counter.
 **     @param
 **         DeviceDataPtr   - Device data structure
 **                           pointer returned by [Init] method.
 **     @return
 **                         - Error code, possible codes:
-**                           ERR_OK - OK
+**                           ERR_OK - OK 
 **                           ERR_SPEED - The component does not work in
 **                           the active clock configuration
 */
 /* ===================================================================*/
-LDD_TError TU1_Disable(LDD_TDeviceData *DeviceDataPtr);
+LDD_TError TU1_ResetCounter(LDD_TDeviceData *DeviceDataPtr);
 
 /*
 ** ===================================================================
-**     Method      :  TU1_SetEventMask (component TimerUnit_LDD)
+**     Method      :  TU1_GetCaptureValue (component TimerUnit_LDD)
 */
 /*!
 **     @brief
-**         Enables/disables event(s). The events contained within the
-**         mask are enabled. Events not contained within the mask are
-**         disabled. The component event masks are defined in the
-**         PE_Types.h file. Note: Event that are not generated (See the
-**         "Events" tab in the Component inspector) are not handled by
-**         this method. In this case the method returns ERR_PARAM_MASK
-**         error code. See also method [GetEventMask].
+**         Returns the content of capture register specified by the
+**         parameter ChannelIdx. This method is available when at least
+**         one channel is configured.
 **     @param
 **         DeviceDataPtr   - Device data structure
 **                           pointer returned by [Init] method.
 **     @param
-**         EventMask       - Event mask
+**         ChannelIdx      - Index of the component
+**                           channel.
+**     @param
+**         ValuePtr        - Pointer to return value of the
+**                           capture register.
 **     @return
 **                         - Error code, possible codes:
-**                           ERR_OK - OK
+**                           ERR_OK - OK 
+**                           ERR_PARAM_INDEX - ChannelIdx parameter is
+**                           out of possible range
+**                           ERR_NOTAVAIL -  The capture mode is not
+**                           selected for selected channel.
 **                           ERR_SPEED - The component does not work in
 **                           the active clock configuration
-**                           ERR_PARAM_MASK - Event mask is not valid
 */
 /* ===================================================================*/
-LDD_TError TU1_SetEventMask(LDD_TDeviceData *DeviceDataPtr, LDD_TEventMask EventMask);
+LDD_TError TU1_GetCaptureValue(LDD_TDeviceData *DeviceDataPtr, uint8_t ChannelIdx, TU1_TValueType *ValuePtr);
 
 /*
 ** ===================================================================
