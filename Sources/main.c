@@ -32,11 +32,9 @@
 #include <CPU.h>
 #include <event_buff.h>
 #include <KY_038.h>
-#include <LEDB.h>
-#include <LEDG.h>
-#include <LEDR.h>
 #include <MMA1.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <TI2.h>
 #include <Ultrasonic.h>
 #include <WAIT1.h>
@@ -52,6 +50,11 @@ enum ORIENTATION
 };
 
 #define GRAVITY_THRESHOLD	2000
+
+#define POSITIVE_LOWER_THRESHOLD	1
+#define POSITIVE_UPPER_THRESHOLD	5
+#define NEGATIVE_LOWER_THRESHOLD	25
+#define NEGATIVE_UPPER_THRESHOLD	30
 #define PARASITIC_ECHO_AVOIDANCE	50
 #define AMBIENT_TEMPERATURE	22
 
@@ -95,7 +98,6 @@ int main(void)
 	 */
 	for(;;)
 	{
-		/*
 	    if(abs(MMA1_GetX()) >= GRAVITY_THRESHOLD &&
 	    		last_orientation != VERTICAL)
 	    {
@@ -121,17 +123,20 @@ int main(void)
 	    	event_buff_insert_event(ORIENTATION_CHANG_TO_HOR_DOWN);
 	    }
 
-	    if(!event_buff_is_empty())
-	    			event_handler(event_buff_consume_event());
-		*/
+	    distance = US_usToCentimeters(US_Measure_us(),
+	    		AMBIENT_TEMPERATURE);
 
-	    distance = US_usToCentimeters(US_Measure_us(), AMBIENT_TEMPERATURE);
-
-	    LEDR_Put(distance < 10);
-	    LEDG_Put(distance >= 10 && distance <= 50);
-	    LEDB_Put(distance > 50 && distance <= 100);
+	    if(distance >= POSITIVE_LOWER_THRESHOLD && distance <=
+	    		POSITIVE_UPPER_THRESHOLD)
+	    	event_buff_insert_event(POSITIVE_ACCELERATION);
+	    else if(distance >= NEGATIVE_LOWER_THRESHOLD && distance <=
+	    		NEGATIVE_UPPER_THRESHOLD)
+	    	event_buff_insert_event(NEGATIVE_ACCELERATION);
 
 	    WAIT1_Waitms(PARASITIC_ECHO_AVOIDANCE);
+
+	    if(!event_buff_is_empty())
+	    			event_handler(event_buff_consume_event());
 	}
 
 	/*** Don't write any code pass this line, or it will be deleted during code generation. ***/

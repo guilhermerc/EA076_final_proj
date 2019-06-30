@@ -89,10 +89,12 @@ void fsm_iterate(EVENT_BUFF_TYPE event)
 		{
 		case POSITIVE_ACCELERATION:
 		{
+			console_write("NEW EVENT", "POSITIVE ACCELERATION\n");
 			break;
 		}
 		case NEGATIVE_ACCELERATION:
 		{
+			console_write("NEW EVENT", "NEGATIVE ACCELERATION\n");
 			break;
 		}
 		}
@@ -104,10 +106,12 @@ void fsm_iterate(EVENT_BUFF_TYPE event)
 		{
 		case POSITIVE_ACCELERATION:
 		{
+			console_write("NEW EVENT", "POSITIVE ACCELERATION\n");
 			break;
 		}
 		case NEGATIVE_ACCELERATION:
 		{
+			console_write("NEW EVENT", "NEGATIVE ACCELERATION\n");
 			break;
 		}
 		}
@@ -131,4 +135,6 @@ void fsm_iterate(EVENT_BUFF_TYPE event)
 		break;
 	}
 	}
+
+	WAIT1_Waitms(DEBOUNCING_TIMEOUT);
 }
