@@ -11,7 +11,11 @@
 #include <fsm.h>
 #include <WAIT1.h>
 
+#define DEBUG_MODE	TRUE
+
 #define	DEBOUNCING_TIMEOUT	700
+
+#define BROWSING_TOPIC	"\"browsing\""
 
 static FSM_STATE curr_state = -1;
 
@@ -25,22 +29,26 @@ void fsm_set_state(FSM_STATE state)
 	{
 	case HORIZONTAL_UPWARDS_IDLE:
 	{
-		console_write("NEW STATE", "HORIZONTAL UPWARDS IDLE\n");
+		if(DEBUG_MODE)
+			console_write("NEW STATE", "HORIZONTAL UPWARDS IDLE\n");
 		break;
 	}
 	case HORIZONTAL_DOWNWARDS_IDLE:
 	{
-		console_write("NEW STATE", "HORIZONTAL DOWNWARDS IDLE\n");
+		if(DEBUG_MODE)
+			console_write("NEW STATE", "HORIZONTAL DOWNWARDS IDLE\n");
 		break;
 	}
 	case LATERAL_IDLE:
 	{
-		console_write("NEW STATE", "LATERAL IDLE\n");
+		if(DEBUG_MODE)
+			console_write("NEW STATE", "LATERAL IDLE\n");
 		break;
 	}
 	case VERTICAL_IDLE_ZOOM_MODE:
 	{
-		console_write("NEW STATE", "VERTICAL IDLE ZOOM MODE\n");
+		if(DEBUG_MODE)
+			console_write("NEW STATE", "VERTICAL IDLE ZOOM MODE\n");
 		break;
 	}
 	}
@@ -59,12 +67,16 @@ void fsm_iterate(EVENT_BUFF_TYPE event)
 		{
 		case SINGLE_FINGER_SNAPPING:
 		{
-			console_write("NEW EVENT", "SINGLE FINGER SNAPPING\n");
+			comm_publish(BROWSING_TOPIC, "open tab");
+			if(DEBUG_MODE)
+				console_write("NEW EVENT", "SINGLE FINGER SNAPPING\n");
 			break;
 		}
 		case DOUBLE_FINGER_SNAPPING:
 		{
-			console_write("NEW EVENT", "DOUBLE FINGER SNAPPING\n");
+			comm_publish(BROWSING_TOPIC, "close tab");
+			if(DEBUG_MODE)
+				console_write("NEW EVENT", "DOUBLE FINGER SNAPPING\n");
 			break;
 		}
 		}
@@ -76,7 +88,9 @@ void fsm_iterate(EVENT_BUFF_TYPE event)
 		{
 		case DOUBLE_FINGER_SNAPPING:
 		{
-			console_write("NEW EVENT", "DOUBLE FINGER SNAPPING\n");
+			comm_publish(BROWSING_TOPIC, "close browser");
+			if(DEBUG_MODE)
+				console_write("NEW EVENT", "DOUBLE FINGER SNAPPING\n");
 			break;
 		}
 		}
@@ -89,10 +103,16 @@ void fsm_iterate(EVENT_BUFF_TYPE event)
 		{
 		case POSITIVE_ACCELERATION:
 		{
+			comm_publish(BROWSING_TOPIC, "next tab");
+			if(DEBUG_MODE)
+				console_write("NEW EVENT", "POSITIVE ACCELERATION\n");
 			break;
 		}
 		case NEGATIVE_ACCELERATION:
 		{
+			comm_publish(BROWSING_TOPIC, "previous tab");
+			if(DEBUG_MODE)
+				console_write("NEW EVENT", "NEGATIVE ACCELERATION\n");
 			break;
 		}
 		}
@@ -104,10 +124,16 @@ void fsm_iterate(EVENT_BUFF_TYPE event)
 		{
 		case POSITIVE_ACCELERATION:
 		{
+			comm_publish(BROWSING_TOPIC, "zoom in");
+			if(DEBUG_MODE)
+				console_write("NEW EVENT", "POSITIVE ACCELERATION\n");
 			break;
 		}
 		case NEGATIVE_ACCELERATION:
 		{
+			comm_publish(BROWSING_TOPIC, "zoom out");
+			if(DEBUG_MODE)
+				console_write("NEW EVENT", "NEGATIVE ACCELERATION\n");
 			break;
 		}
 		}
@@ -119,12 +145,14 @@ void fsm_iterate(EVENT_BUFF_TYPE event)
 		{
 		case SINGLE_FINGER_SNAPPING:
 		{
-			console_write("NEW EVENT", "SINGLE FINGER SNAPPING\n");
+			if(DEBUG_MODE)
+				console_write("NEW EVENT", "SINGLE FINGER SNAPPING\n");
 			break;
 		}
 		case DOUBLE_FINGER_SNAPPING:
 		{
-			console_write("NEW EVENT", "DOUBLE FINGER SNAPPING\n");
+			if(DEBUG_MODE)
+				console_write("NEW EVENT", "DOUBLE FINGER SNAPPING\n");
 			break;
 		}
 		}
