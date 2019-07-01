@@ -184,34 +184,18 @@ void event_handler(EVENT_BUFF_TYPE event)
 	}
 	else if(event == ORIENTATION_CHANG_TO_HOR_UP)
 	{
-		LEDR_On();
-		LEDG_Off();
-		LEDB_Off();
-
 		fsm_set_state(HORIZONTAL_UPWARDS_IDLE);
 	}
 	else if(event == ORIENTATION_CHANG_TO_HOR_DOWN)
 	{
-		LEDR_On();
-		LEDG_Off();
-		LEDB_Off();
-
 		fsm_set_state(HORIZONTAL_DOWNWARDS_IDLE);
 	}
 	else if(event == ORIENTATION_CHANG_TO_LAT)
 	{
-		LEDR_Off();
-		LEDG_On();
-		LEDB_Off();
-
 		fsm_set_state(LATERAL_IDLE);
 	}
 	else if(event == ORIENTATION_CHANG_TO_VER)
 	{
-		LEDR_Off();
-		LEDG_Off();
-		LEDB_On();
-
 		fsm_set_state(VERTICAL_IDLE_ZOOM_MODE);
 	}
 }
