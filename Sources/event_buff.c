@@ -198,4 +198,12 @@ void event_handler(EVENT_BUFF_TYPE event)
 	{
 		fsm_set_state(VERTICAL_IDLE_ZOOM_MODE);
 	}
+	else if(event == POSITIVE_ACCELERATION)
+	{
+		fsm_iterate(POSITIVE_ACCELERATION);
+	}
+	else if(event == NEGATIVE_ACCELERATION)
+	{
+		fsm_iterate(NEGATIVE_ACCELERATION);
+	}
 }
