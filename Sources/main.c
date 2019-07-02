@@ -68,7 +68,7 @@ int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
 {
 	/* Write your local variable definition here */
-	enum ORIENTATION last_orientation = -1;
+ 	enum ORIENTATION last_orientation = -1;
 	uint16_t distance = 0;
 
 	/*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
@@ -98,6 +98,8 @@ int main(void)
 	 */
 	for(;;)
 	{
+		/*! Checks if there was a change on board's orientation and if so,
+		 * inserts the corresponding event into the event buffer.	*/
 	    if(abs(MMA1_GetX()) >= GRAVITY_THRESHOLD &&
 	    		last_orientation != VERTICAL)
 	    {
@@ -123,9 +125,11 @@ int main(void)
 	    	event_buff_insert_event(ORIENTATION_CHANG_TO_HOR_DOWN);
 	    }
 
+	    /*! Gets the distance to the hand of user	 */
 	    distance = US_usToCentimeters(US_Measure_us(),
 	    		AMBIENT_TEMPERATURE);
 
+	    /*! Checks if user has approximated or moved away his hand from sensor */
 	    if(distance >= POSITIVE_LOWER_THRESHOLD && distance <=
 	    		POSITIVE_UPPER_THRESHOLD)
 	    	event_buff_insert_event(POSITIVE_ACCELERATION);
@@ -135,6 +139,7 @@ int main(void)
 
 	    WAIT1_Waitms(PARASITIC_ECHO_AVOIDANCE);
 
+	    /*! Treats the first non-treated event from event buffer */
 	    if(!event_buff_is_empty())
 	    			event_handler(event_buff_consume_event());
 	}

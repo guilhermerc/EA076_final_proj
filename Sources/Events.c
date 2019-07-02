@@ -243,7 +243,7 @@ void UART2_OnTxChar(void)
 	}
 }
 
-/*
+/*!
 ** ===================================================================
 **     Event       :  KY_038_OnInterrupt (module Events)
 **
@@ -257,11 +257,11 @@ void UART2_OnTxChar(void)
 */
 void KY_038_OnInterrupt(void)
 {
-	/* If this is the first snapping since the last timeout, starts a new
+	/*! If this is the first snapping since the last timeout, starts a new
 	 * timeout counting process.
 	 */
 
-    EnterCritical();                   /* Disable global interrupts */
+    EnterCritical();                   /*! Disable global interrupts */
 
     DEBOUNCING_Waitms(DEBOUNCING_TIMEOUT);
 
@@ -271,14 +271,14 @@ void KY_038_OnInterrupt(void)
 		TI2_EnableEvent();
 	}
 
-	snapping_counter++;	// And increment the number of snappings
+	snapping_counter++;	/// And increment the number of snappings
 
-    ExitCritical();                    /* Enable global interrupts */
+    ExitCritical();                    /*! Enable global interrupts */
 
 	PORT_PDD_ClearPinInterruptFlag(PORTA_BASE_PTR, 5);
 }
 
-/*
+/*!
 ** ===================================================================
 **     Event       :  TI2_OnInterrupt (module Events)
 **
@@ -296,7 +296,7 @@ void TI2_OnInterrupt(void)
 {
   	timeout_counter++;
 
-  	/* If the timeout was achieved, inserts the proper event into the event
+  	/*! If the timeout was achieved, inserts the proper event into the event
   	 * buffer.
   	 * NOTE: If 3 or more snappings occurred, it is not considered an event.
   	 */
@@ -313,13 +313,13 @@ void TI2_OnInterrupt(void)
   	}
 }
 
-/*
+/*!
 ** ===================================================================
 **     Event       :  TU1_OnCounterRestart (module Events)
 **
 **     Component   :  TU1 [TimerUnit_LDD]
-*/
-/*!
+**
+**
 **     @brief
 **         Called if counter overflow/underflow or counter is
 **         reinitialized by modulo or compare register matching.
@@ -337,13 +337,13 @@ void TU1_OnCounterRestart(LDD_TUserData *UserDataPtr)
 	US_EventEchoOverflow(UserDataPtr);
 }
 
-/*
+/*!
 ** ===================================================================
 **     Event       :  TU1_OnChannel0 (module Events)
 **
 **     Component   :  TU1 [TimerUnit_LDD]
-*/
-/*!
+**
+**
 **     @brief
 **         Called if compare register match the counter registers or
 **         capture register has a new content. OnChannel0 event and
