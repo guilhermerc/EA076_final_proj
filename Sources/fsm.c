@@ -13,17 +13,24 @@
 
 #define DEBUG_MODE	TRUE
 
-#define	DEBOUNCING_TIMEOUT	700
+#define	DEBOUNCING_TIMEOUT	800
 
 #define BROWSING_TOPIC	"\"browsing\""
 
 static FSM_STATE curr_state = -1;
 
+/*!
+ * @brief A function that sets the current state of FSM
+ *
+ * @param	state	The state to be set as current state
+ *
+ */
 void fsm_set_state(FSM_STATE state)
 {
 	curr_state = state;
 
-	while(comm_status() != AVAILABLE);
+	if(DEBUG_MODE)
+		while(comm_status() != AVAILABLE);
 
 	switch(state)
 	{
@@ -57,6 +64,13 @@ void fsm_set_state(FSM_STATE state)
 
 }
 
+/*!
+ * @brief A function that iterates (that is, (possibly) performs a transition)
+ * over the FSM given an occurred event
+ *
+ * @param	event	The event that might cause a transition on FSM
+ *
+ */
 void fsm_iterate(EVENT_BUFF_TYPE event)
 {
 	switch(curr_state)
@@ -159,4 +173,6 @@ void fsm_iterate(EVENT_BUFF_TYPE event)
 		break;
 	}
 	}
+
+	WAIT1_Waitms(DEBOUNCING_TIMEOUT);
 }
