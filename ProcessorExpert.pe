@@ -3,7 +3,7 @@
   <Header>
     <Name>EA076_final_proj</Name>
     <SavedBy>guilherme</SavedBy>
-    <ModificationStamp>128</ModificationStamp>
+    <ModificationStamp>130</ModificationStamp>
     <Date>2019-03-18</Date>
     <IDE>Eclipse IDE</IDE>
     <PEversion>1.12.2.RT7_b1550-0615</PEversion>
@@ -7601,7 +7601,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>128</Value>
+        <Value>256</Value>
         <Base>DEC</Base>
       </ItemState>
       <ItemState>
@@ -7609,7 +7609,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>128</Value>
+        <Value>256</Value>
         <Base>DEC</Base>
       </ItemState>
       <ItemState>
@@ -7845,7 +7845,7 @@
         <ItemSymbol>Inp</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>ADC0_DM3/ADC0_SE7a/PTE23/TPM2_CH1/UART2_RX</Value>
+        <Value>PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO</Value>
         <SharedPrphMode>false</SharedPrphMode>
       </ItemState>
       <ItemState>
@@ -7887,7 +7887,7 @@
         <ItemSymbol>Out</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>ADC0_DP3/ADC0_SE3/PTE22/TPM2_CH0/UART2_TX</Value>
+        <Value>PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI</Value>
         <SharedPrphMode>false</SharedPrphMode>
       </ItemState>
       <ItemState>
@@ -8663,7 +8663,7 @@
               <ItemSymbol>Inp</ItemSymbol>
               <ReadOnly>false</ReadOnly>
               <UserReadOnly>false</UserReadOnly>
-              <Value>ADC0_DM3/ADC0_SE7a/PTE23/TPM2_CH1/UART2_RX</Value>
+              <Value>PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO</Value>
               <SharedPrphMode>false</SharedPrphMode>
             </ItemState>
             <ItemState>
@@ -8684,7 +8684,7 @@
               <ItemSymbol>Out</ItemSymbol>
               <ReadOnly>false</ReadOnly>
               <UserReadOnly>false</UserReadOnly>
-              <Value>ADC0_DP3/ADC0_SE3/PTE22/TPM2_CH0/UART2_TX</Value>
+              <Value>PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI</Value>
               <SharedPrphMode>false</SharedPrphMode>
             </ItemState>
             <ItemState>

@@ -7,7 +7,7 @@
 **     Version     : Component 01.188, Driver 01.12, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2019-06-15, 18:06, # CodeGen: 17
+**     Date/Time   : 2019-07-01, 01:03, # CodeGen: 63
 **     Abstract    :
 **         This component "Serial_LDD" implements an asynchronous serial
 **         communication. The component supports different settings of
@@ -38,10 +38,10 @@
 **            Receiver input                               : Not inverted
 **            Break generation length                      : 10/11 bits
 **            Receiver                                     : Enabled
-**              RxD                                        : ADC0_DM3/ADC0_SE7a/PTE23/TPM2_CH1/UART2_RX
+**              RxD                                        : PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO
 **              RxD pin signal                             : 
 **            Transmitter                                  : Enabled
-**              TxD                                        : ADC0_DP3/ADC0_SE3/PTE22/TPM2_CH0/UART2_TX
+**              TxD                                        : PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI
 **              TxD pin signal                             : 
 **            Flow control                                 : None
 **          Initialization                                 : 
@@ -178,20 +178,20 @@ LDD_TDeviceData* ASerialLdd2_Init(LDD_TUserData *UserDataPtr)
   INT_UART2__DEFAULT_RTOS_ISRPARAM = DeviceDataPrv;
   /* SIM_SCGC4: UART2=1 */
   SIM_SCGC4 |= SIM_SCGC4_UART2_MASK;
-  /* PORTE_PCR23: ISF=0,MUX=4 */
-  PORTE_PCR23 = (uint32_t)((PORTE_PCR23 & (uint32_t)~(uint32_t)(
-                 PORT_PCR_ISF_MASK |
-                 PORT_PCR_MUX(0x03)
-                )) | (uint32_t)(
-                 PORT_PCR_MUX(0x04)
-                ));
-  /* PORTE_PCR22: ISF=0,MUX=4 */
-  PORTE_PCR22 = (uint32_t)((PORTE_PCR22 & (uint32_t)~(uint32_t)(
-                 PORT_PCR_ISF_MASK |
-                 PORT_PCR_MUX(0x03)
-                )) | (uint32_t)(
-                 PORT_PCR_MUX(0x04)
-                ));
+  /* PORTD_PCR2: ISF=0,MUX=3 */
+  PORTD_PCR2 = (uint32_t)((PORTD_PCR2 & (uint32_t)~(uint32_t)(
+                PORT_PCR_ISF_MASK |
+                PORT_PCR_MUX(0x04)
+               )) | (uint32_t)(
+                PORT_PCR_MUX(0x03)
+               ));
+  /* PORTD_PCR3: ISF=0,MUX=3 */
+  PORTD_PCR3 = (uint32_t)((PORTD_PCR3 & (uint32_t)~(uint32_t)(
+                PORT_PCR_ISF_MASK |
+                PORT_PCR_MUX(0x04)
+               )) | (uint32_t)(
+                PORT_PCR_MUX(0x03)
+               ));
   /* NVIC_IPR3: PRI_14=0x80 */
   NVIC_IPR3 = (uint32_t)((NVIC_IPR3 & (uint32_t)~(uint32_t)(
                NVIC_IP_PRI_14(0x7F)
